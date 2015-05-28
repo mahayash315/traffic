@@ -1,7 +1,7 @@
 import numpy
 import matplotlib.pyplot as plt
 
-def plot(Y, pred_Y):
+def plot(Y, pred_Y=None, title='', block=True):
 	''' Plot the actual Y and predicted Y
 
     :param Y: n-by-m actual data
@@ -19,11 +19,16 @@ def plot(Y, pred_Y):
 	for i in xrange(m):
 		ax.append(fig.add_subplot(m,1,i+1))
 
-	# plot the actual data
+	# plot the data
 	Yt = Y.transpose()
-	pred_Yt = pred_Y.transpose()
-	for i in xrange(m):
-		ax[i].plot(numpy.array(xrange(n)), Yt[i], "r.-")
-		ax[i].plot(numpy.array(xrange(n)), pred_Yt[i], "b.-")
+	if pred_Y == None:
+		for i in xrange(m):
+			ax[i].plot(numpy.array(xrange(n)), Yt[i], "r.-")
+	else:
+		pred_Yt = pred_Y.transpose()
+		for i in xrange(m):
+			ax[i].plot(numpy.array(xrange(n)), Yt[i], "r.-")
+			ax[i].plot(numpy.array(xrange(n)), pred_Yt[i], "b.-")
 
-	plt.show()
+	plt.title(title)
+	plt.show(block=block)

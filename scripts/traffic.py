@@ -6,9 +6,9 @@ import numpy
 
 import theano
 import theano.tensor as T
-from theano.tensor.shared_randomstreams import RandomStreams
-
 import xml.etree.ElementTree as ET
+
+import plot
 
 def load_data(dataset, r=0, d=1):
     ''' Loads the dataset
@@ -64,9 +64,10 @@ def load_data(dataset, r=0, d=1):
 
 if __name__ == '__main__':
     try:
-        dataset = load_data('/Users/masayuki/traffic/data/lane.xml')
+        dataset = load_data('../data/lane.180000.2.xml')
         print('success')
-        print(dataset)
+        dataset_x, dataset_y = dataset
+        plot.plot(dataset_y)
     except Exception as e:
         print('error')
         print(str(e))
