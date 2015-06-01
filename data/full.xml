@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 火  5/26 14:26:38 2015 by SUMO gui Version 0.23.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumo-gui.exeConfiguration.xsd">
+
+    <input>
+        <net-file value="/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full/net.net.xml"/>
+        <route-files value="/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full/input_routes.rou.xml"/>
+        <additional-files value="/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full/additional.xml"/>
+    </input>
+
+    <output>
+        <full-output value="/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full/full.xml"/>
+        <save-state.prefix value="/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full/state"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <end value="18000"/>
+    </time>
+
+    <report>
+        <xml-validation value="never"/>
+        <no-duration-log value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <emissions>
+        <phemlight-path value="/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full/./PHEMlight/"/>
+    </emissions>
+
+</configuration>
+-->
+
+<full-export xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/full_file.xsd">
+</full-export>

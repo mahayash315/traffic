@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<additional>
+	<laneData id="abc" file="lane.xml" freq="900" />
+</additional>

@@ -1,0 +1,15 @@
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+   <route id="always_left" edges="1fi 1si 4o 4fi 4si 2o 2fi 2si 3o 3fi 3si 1o 1fi"/>
+   <route id="always_right" edges="3fi 3si 2o 2fi 2si 4o 4fi 4si 1o 1fi 1si 3o 3fi"/>
+   <route id="horizontal" edges="2fi 2si 1o 1fi 1si 2o 2fi"/>
+   <route id="vertical" edges="3fi 3si 4o 4fi 4si 3o 3fi"/>
+
+   <flow id="always_left" route="always_left" begin="100" end="180000" period="70"/>
+   <flow id="always_right" route="always_right" begin="100" end="180000" period="60"/>
+   <flow id="horizontal" route="horizontal" begin="100" end="180000" period="40"/>
+   <flow id="vertical" route="vertical" begin="100" end="180000" period="30"/>
+   <flow id="always_left_2" route="always_left" begin="120000" end="160000" period="40"/>
+   <flow id="always_right_2" route="always_right" begin="120000" end="160000" period="30"/>
+   <flow id="horizontal_2" route="horizontal" begin="120000" end="160000" period="20"/>
+   <flow id="vertical_2" route="vertical" begin="120000" end="160000" period="80"/>
+</routes>
