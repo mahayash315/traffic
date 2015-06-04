@@ -19,16 +19,16 @@ def load_data(dataset, r=0, d=1):
     cut1 = int(0.7 * len(dataset_x)) # 80% for training
     cut2 = int(0.8 * len(dataset_y)) # 10% for validation, 10% for testing
 
-    idx = range(len(dataset_x))
+    idx = range(0, cut2)
     numpy.random.shuffle(idx)
 
     train = idx[:cut1]
     train_set_x = dataset_x[train]
     train_set_y = dataset_y[train]
-    valid = idx[cut1:cut2]
+    valid = idx[cut1:]
     valid_set_x = dataset_x[valid]
     valid_set_y = dataset_y[valid]
-    test = idx[cut2:]
+    test = range(cut2, len(dataset_x))
     test_set_x = dataset_x[test]
     test_set_y = dataset_y[test]
 
@@ -39,7 +39,7 @@ def load_data(dataset, r=0, d=1):
 def test_regression():
     try:
         print('loading dataset...'),
-        datasets = load_data('/Users/masayuki/traffic/data/lane.180000.2.xml', r=0, d=1)
+        datasets = load_data('/Users/masayuki/git/traffic/data/lane.180000.3.xml', r=0, d=1)
         print('done')
 
         train_set_x, train_set_y = datasets[0]

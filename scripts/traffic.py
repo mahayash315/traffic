@@ -33,8 +33,8 @@ def load_data(dataset, r=0, d=1):
             return (speed * density / 3.6)
         except:
             print('warning: no valid data at interval={}, lane={}'.format(idx_intr,idx_lane))
-            if 0 < idx_intr:
-                return f(idx_intr-1, idx_lane)
+            #if 0 < idx_intr:
+            #    return f(idx_intr-1, idx_lane)
             return 0
 
     # the size of dataset
