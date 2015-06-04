@@ -7,6 +7,7 @@ import theanets
 
 import traffic
 import plot
+import helper
 
 def load_data(dataset, r=0, d=1):
     ''' Loads the dataset and setup experiment
@@ -61,7 +62,7 @@ def test_regression():
                 theanets.feedforward.Regressor,
                 layers=(n_input,100,100,n_output),
                 optimize='sgd',
-                activation='tanh'
+                activation='relu'
             )
 
         def pretrain(num):

@@ -64,7 +64,7 @@ def load_data(dataset, r=0, d=1):
 
 if __name__ == '__main__':
     try:
-        dataset = load_data('../data/lane.18000.xml')
+        dataset = load_data('/Users/masayuki/git/traffic/data/lane.180000.3.xml',r=0,d=1)
         print('success')
         dataset_x, dataset_y = dataset
         plot.plot(dataset_y)
