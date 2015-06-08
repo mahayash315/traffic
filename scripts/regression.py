@@ -17,19 +17,27 @@ def load_data(dataset, r=0, d=1):
     dataset_x, dataset_y = traffic.load_data(dataset, r=r, d=d)
 
     # cut the dataset for training, testing, validation
-    cut1 = int(0.7 * len(dataset_x)) # 80% for training
-    cut2 = int(0.8 * len(dataset_y)) # 10% for validation, 10% for testing
+    cut1 = int(0.8 * len(dataset_x)) # 80% for training
+    cut2 = int(0.9 * len(dataset_x)) # 10% for validation, 10% for testing
+    # cut1 = int(0.9 * len(dataset_x)) # 80% for training
+    # cut2 = int(1.0 * len(dataset_x)) # 10% for validation, 10% for testing
 
-    idx = range(0, cut2)
+    idx = range(0, len(dataset_x))
     numpy.random.shuffle(idx)
-
     train = idx[:cut1]
+    valid = idx[cut1:cut2]
+    test = idx[cut2:]
+
+    # idx = range(0, cut2)
+    # numpy.random.shuffle(idx)
+    # train = idx[:cut1]
+    # valid = idx[cut1:]
+    # test = range(0, len(dataset_x))
+
     train_set_x = dataset_x[train]
     train_set_y = dataset_y[train]
-    valid = idx[cut1:]
     valid_set_x = dataset_x[valid]
     valid_set_y = dataset_y[valid]
-    test = range(cut2, len(dataset_x))
     test_set_x = dataset_x[test]
     test_set_y = dataset_y[test]
 
@@ -60,9 +68,13 @@ def test_regression():
         # create an experiment
         exp = theanets.Experiment(
                 theanets.feedforward.Regressor,
-                layers=(n_input,100,100,n_output),
+                layers=(
+                    n_input,
+                    dict(size=100, activation='linear'),
+                    n_output
+                ),
                 optimize='sgd',
-                activation='relu'
+                activation='linear'
             )
 
         def pretrain(num):
@@ -70,18 +82,13 @@ def test_regression():
                 train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
                 print(' {}: train[loss]={}, valid[loss]={}'.format(i+1, train['loss'], valid['loss']))
 
-        def train(num, base_lr=0.01, gamma=0.1, stepsize=1, momentum=0.9, callback=None):
-            learning_rate = base_lr
-            for i in xrange(num):
-                #train, valid = exp.train(train_set, valid_set, learning_rate=learning_rate, momentum=momentum)
-                for train, valid in exp.itertrain(train_set, valid_set, learning_rate=learning_rate, momentum=momentum):
-                    print(' {}({},{}): train[loss]={}, valid[loss]={}'.format(i+1, learning_rate, momentum, train['loss'], valid['loss']))
-                if callable(callback):
-                    callback(i, train=train, valid=valid)
-                if i % stepsize == 0:
-                    learning_rate *= gamma
+        def train(learning_rate=0.01, momentum=0.9, callback=None):
+            for train, valid in exp.itertrain(train_set, valid_set, learning_rate=learning_rate, momentum=momentum):
+                print(' ({},{}): train[loss]={}, valid[loss]={}'.format(learning_rate, momentum, train['loss'], valid['loss']))
+            if callable(callback):
+                callback(train=train, valid=valid)
 
-        def test(n, train=None, valid=None, block=False):
+        def test(train=None, valid=None, block=False):
             pred_y = exp.network.predict(test_set_x)
 
             # calculate Mean Absolute Percentage Error (MAPE)
@@ -97,7 +104,7 @@ def test_regression():
             print("MAE = {}".format(mae))
             print("MRE = {}%".format(mre*100.0))
 
-            plot.plot(test_set_y, pred_y, title="{}".format(n), block=block)
+            plot.plot(test_set_y, pred_y, block=block)
 
         # pretrain the model
         print('pretraining...')
@@ -107,14 +114,27 @@ def test_regression():
 
         # train the model
         print('training...')
-        #train(3, callback=test)
-        train(1, base_lr=0.01, momentum=0.9, callback=test)
-        train(1, base_lr=0.001, momentum=0.99, callback=test)
-        train(1, base_lr=0.0001, momentum=0.999, callback=test)
+        loss = -1
+        # while True:
+        #     train, valid = exp.train(train_set, valid_set, learning_rate=0.01, momentum=0.9)
+        #     print('  train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
+        #     if (0 <= loss and loss < train['loss']):
+        #         break
+        #     loss = train['loss']
+        train(learning_rate=0.01, momentum=0.9, callback=test)
+        train(learning_rate=0.001, momentum=0.99, callback=test)
+        train(learning_rate=0.0001, momentum=0.999, callback=test)
+        train(learning_rate=0.00001, momentum=0.9999, callback=test)
+        train(learning_rate=0.000001, momentum=0.99999, callback=test)
+        train(learning_rate=0.0000001, momentum=0.999999, callback=test)
+        train(learning_rate=0.00000001, momentum=0.9999999, callback=test)
+        train(learning_rate=0.000000001, momentum=0.99999999, callback=test)
+        train(learning_rate=0.0000000001, momentum=0.999999999, callback=test)
+        train(learning_rate=0.00000000001, momentum=0.9999999999, callback=test)
         print('done')
 
         # test the model
-        test(10, block=True)
+        test(block=True)
         print("finished.")
 
 
