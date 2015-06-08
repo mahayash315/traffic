@@ -19,15 +19,14 @@ def load_data(dataset, r=0, d=1):
     # cut the dataset for training, testing, validation
     cut1 = int(0.8 * len(dataset_x)) # 80% for training
     cut2 = int(0.9 * len(dataset_x)) # 10% for validation, 10% for testing
-    # cut1 = int(0.9 * len(dataset_x)) # 80% for training
-    # cut2 = int(1.0 * len(dataset_x)) # 10% for validation, 10% for testing
-
     idx = range(0, len(dataset_x))
     numpy.random.shuffle(idx)
     train = idx[:cut1]
     valid = idx[cut1:cut2]
     test = idx[cut2:]
 
+    # cut1 = int(0.9 * len(dataset_x)) # 80% for training
+    # cut2 = int(1.0 * len(dataset_x)) # 10% for validation, 10% for testing
     # idx = range(0, cut2)
     # numpy.random.shuffle(idx)
     # train = idx[:cut1]
