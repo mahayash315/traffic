@@ -12,7 +12,7 @@ class TestBed:
         self.filename = filename
         self.r = r
         self.d = d
-        self.datasets = self.load_data(self, filename, r, d)
+        self.datasets = self.load_data(filename, r, d)
 
     def load_data(self, filename, r, d):
         ''' Loads the dataset and setup experiment
@@ -84,7 +84,7 @@ class TestBed:
 
             def pretrain():
                 train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
-                print(' {}: train[loss]={}, valid[loss]={}'.format(i+1, train['loss'], valid['loss']))
+                print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
 
             def train(learning_rate=0.01, momentum=0.9, callback=None):
                 for train, valid in exp.itertrain(train_set, valid_set, learning_rate=learning_rate, momentum=momentum):
