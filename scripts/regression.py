@@ -17,21 +17,21 @@ def load_data(dataset, r=0, d=1):
     dataset_x, dataset_y = traffic.load_data(dataset, r=r, d=d)
 
     # cut the dataset for training, testing, validation
-    cut1 = int(0.8 * len(dataset_x)) # 80% for training
-    cut2 = int(0.9 * len(dataset_x)) # 10% for validation, 10% for testing
-    idx = range(0, len(dataset_x))
-    numpy.random.shuffle(idx)
-    train = idx[:cut1]
-    valid = idx[cut1:cut2]
-    test = idx[cut2:]
-
-    # cut1 = int(0.9 * len(dataset_x)) # 80% for training
-    # cut2 = int(1.0 * len(dataset_x)) # 10% for validation, 10% for testing
-    # idx = range(0, cut2)
+    # cut1 = int(0.8 * len(dataset_x)) # 80% for training
+    # cut2 = int(0.9 * len(dataset_x)) # 10% for validation, 10% for testing
+    # idx = range(0, len(dataset_x))
     # numpy.random.shuffle(idx)
     # train = idx[:cut1]
-    # valid = idx[cut1:]
-    # test = range(0, len(dataset_x))
+    # valid = idx[cut1:cut2]
+    # test = idx[cut2:]
+
+    cut1 = int(0.9 * len(dataset_x)) # 80% for training
+    cut2 = int(1.0 * len(dataset_x)) # 10% for validation, 10% for testing
+    idx = range(0, cut2)
+    numpy.random.shuffle(idx)
+    train = idx[:cut1]
+    valid = idx[cut1:]
+    test = range(0, len(dataset_x))
 
     train_set_x = dataset_x[train]
     train_set_y = dataset_y[train]
@@ -47,7 +47,7 @@ def load_data(dataset, r=0, d=1):
 def test_regression():
     try:
         print('loading dataset...'),
-        datasets = load_data('/Users/masayuki/git/traffic/data/lane.180000.3.xml', r=0, d=1)
+        datasets = load_data('/Users/masayuki/git/traffic/data/lane.180000.3.xml', r=2, d=1)
         print('done')
 
         train_set_x, train_set_y = datasets[0]
@@ -70,9 +70,10 @@ def test_regression():
                 layers=(
                     n_input,
                     dict(size=100, activation='linear'),
+                    # dict(size=100, activation='linear'),
                     n_output
                 ),
-                optimize='sgd',
+                # optimize='sgd',
                 activation='linear'
             )
 
@@ -87,7 +88,7 @@ def test_regression():
             if callable(callback):
                 callback(train=train, valid=valid)
 
-        def test(train=None, valid=None, block=False):
+        def test(train=None, valid=None):
             pred_y = exp.network.predict(test_set_x)
 
             # calculate Mean Absolute Percentage Error (MAPE)
@@ -103,7 +104,12 @@ def test_regression():
             print("MAE = {}".format(mae))
             print("MRE = {}%".format(mre*100.0))
 
+            return pred_y
+
+        def test_and_plot(train=None, valid=None, block=False):
+            pred_y = test(train=train, valid=valid)
             plot.plot(test_set_y, pred_y, block=block)
+
 
         # pretrain the model
         print('pretraining...')
@@ -120,20 +126,16 @@ def test_regression():
         #     if (0 <= loss and loss < train['loss']):
         #         break
         #     loss = train['loss']
-        train(learning_rate=0.01, momentum=0.9, callback=test)
-        train(learning_rate=0.001, momentum=0.99, callback=test)
-        train(learning_rate=0.0001, momentum=0.999, callback=test)
-        train(learning_rate=0.00001, momentum=0.9999, callback=test)
-        train(learning_rate=0.000001, momentum=0.99999, callback=test)
-        train(learning_rate=0.0000001, momentum=0.999999, callback=test)
-        train(learning_rate=0.00000001, momentum=0.9999999, callback=test)
-        train(learning_rate=0.000000001, momentum=0.99999999, callback=test)
-        train(learning_rate=0.0000000001, momentum=0.999999999, callback=test)
-        train(learning_rate=0.00000000001, momentum=0.9999999999, callback=test)
+        learning_rate = 0.01
+        momentum = 0.9
+        for i in xrange(10):
+            train(learning_rate, momentum, test)
+            learning_rate *= 0.1
+            momentum += 9.0/pow(10,i+2)
         print('done')
 
         # test the model
-        test(block=True)
+        test_and_plot(block=True)
         print("finished.")
 
 
