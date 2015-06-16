@@ -8,11 +8,15 @@ import traffic
 import plot
 
 class TestBed:
-    def __init__(self, filename, r=0, d=1):
+    def __init__(self, filename, r=0, d=1, debug_level=0):
+        self.debug_level = debug_level
         self.filename = filename
         self.r = r
         self.d = d
         self.datasets = self.load_data(filename, r, d)
+
+    def setDebug(self, debug_level):
+        self.debug_level = debug_level
 
     def load_data(self, filename, r, d):
         ''' Loads the dataset and setup experiment
@@ -22,20 +26,12 @@ class TestBed:
         dataset_x, dataset_y = traffic.load_data(filename, r=r, d=d)
 
         # cut the dataset for training, testing, validation
-        # cut1 = int(0.8 * len(dataset_x)) # 80% for training
-        # cut2 = int(0.9 * len(dataset_x)) # 10% for validation, 10% for testing
-        # idx = range(0, len(dataset_x))
-        # numpy.random.shuffle(idx)
-        # train = idx[:cut1]
-        # valid = idx[cut1:cut2]
-        # test = idx[cut2:]
-
-        cut1 = int(0.9 * len(dataset_x)) # 80% for training
-        cut2 = int(1.0 * len(dataset_x)) # 10% for validation, 10% for testing
-        idx = range(0, cut2)
+        cut1 = int(0.5 * len(dataset_x)) # 80% for training
+        cut2 = int(0.6 * len(dataset_x)) # 10% for validation, 10% for testing
+        idx = range(0, len(dataset_x))
         numpy.random.shuffle(idx)
         train = idx[:cut1]
-        valid = idx[cut1:]
+        valid = idx[cut1:cut2]
         test = range(0, len(dataset_x))
 
         train_set_x = dataset_x[train]
@@ -45,9 +41,10 @@ class TestBed:
         test_set_x = dataset_x[test]
         test_set_y = dataset_y[test]
 
-        print("train data: {}".format(len(train_set_x)))
-        print("valid data: {}".format(len(valid_set_x)))
-        print("test data: {}".format(len(test_set_x)))
+        if (1 <= self.debug_level):
+            print("train data: {}".format(len(train_set_x)))
+            print("valid data: {}".format(len(valid_set_x)))
+            print("test data: {}".format(len(test_set_x)))
 
         self.n_input = len(train_set_x[0])
         self.n_output = len(train_set_y[0])
@@ -67,7 +64,7 @@ class TestBed:
         '''
         return self.n_output
 
-    def test(self, exp, n=10):
+    def test(self, exp, n=10, do_pretrain=True, block=False):
         '''
         与えたネットワーク exp で学習, テストを行う
         :param exp: ネットワーク
@@ -84,11 +81,13 @@ class TestBed:
 
             def pretrain():
                 train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
-                print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
+                if (2 <= self.debug_level):
+                    print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
 
             def train(learning_rate=0.01, momentum=0.9, callback=None):
                 for train, valid in exp.itertrain(train_set, valid_set, learning_rate=learning_rate, momentum=momentum):
-                    print(' ({},{}): train[loss]={}, valid[loss]={}'.format(learning_rate, momentum, train['loss'], valid['loss']))
+                    if (2 <= self.debug_level):
+                        print(' ({},{}): train[loss]={}, valid[loss]={}'.format(learning_rate, momentum, train['loss'], valid['loss']))
                 if callable(callback):
                     callback(train=train, valid=valid)
 
@@ -105,8 +104,9 @@ class TestBed:
                 # print("Y = \n{}".format(test_set_y))
                 # print("Y(pred) = \n{}".format(pred_y))
                 # print("E = \n{}".format(E))
-                print("MAE = {}".format(mae))
-                print("MRE = {}%".format(mre*100.0))
+                if (1 <= self.debug_level):
+                    print("MAE = {}".format(mae))
+                    print("MRE = {}%".format(mre*100.0))
 
                 return pred_y
 
@@ -116,24 +116,30 @@ class TestBed:
 
 
             # pretrain the model
-            print('pretraining...')
-            sys.stdout.flush()
-            pretrain()
-            print('done')
+            if do_pretrain:
+                if (1 <= self.debug_level):
+                    print('pretraining...')
+                    sys.stdout.flush()
+                pretrain()
+                if (1 <= self.debug_level):
+                    print('done')
 
             # train the model
-            print('training...')
-            learning_rate = 0.01
+            if (1 <= self.debug_level):
+                print('training...')
+            learning_rate = 0.1
             momentum = 0.9
             for i in xrange(n):
                 train(learning_rate, momentum, test)
                 learning_rate *= 0.1
                 momentum += 9.0/pow(10,i+2)
-            print('done')
+            if (1 <= self.debug_level):
+                print('done')
 
             # test the model
-            test_and_plot(block=False)
-            print("finished.")
+            test_and_plot(block=block)
+            if (1 <= self.debug_level):
+                print("finished.")
 
         except Exception as e:
             print('error')
@@ -142,7 +148,8 @@ class TestBed:
 
 def test_networks():
     # testbed をつくる
-    bed = TestBed("../data/lane.180000.3.xml", r=2, d=1)
+    # bed = TestBed("../data/lane.180000.3.xml", r=2, d=1)
+    bed = TestBed("/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full_3/lane.xml", r=2, d=1, debug_level=2)
     n_input = bed.get_n_input()
     n_output = bed.get_n_outupt()
 
@@ -154,13 +161,26 @@ def test_networks():
             dict(size=100, activation='linear'),
             n_output
         ),
-        # optimize='sgd',
+        optimize='sgd',
         activation='linear'
     )
     exp2 = theanets.Experiment(
         theanets.feedforward.Regressor,
         layers=(
             n_input,
+            dict(size=100, activation='linear'),
+            dict(size=100, activation='linear'),
+            n_output
+        ),
+        optimize='sgd',
+        activation='linear'
+    )
+    exp3 = theanets.Experiment(
+        theanets.feedforward.Regressor,
+        layers=(
+            n_input,
+            dict(size=100, activation='linear'),
+            dict(size=100, activation='linear'),
             dict(size=100, activation='linear'),
             n_output
         ),
@@ -170,10 +190,11 @@ def test_networks():
 
     # 実験する
     bed.test(exp1, 10)
-    bed.test(exp2, 10)
+    bed.test(exp2, 15)
+    bed.test(exp3, 20, block=True)
 
     # ブロック
-    print raw_input("何かキーを押すと終了")
+    # print raw_input("何かキーを押すと終了")
 
 
 

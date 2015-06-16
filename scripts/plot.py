@@ -10,7 +10,7 @@ def plot(Y, pred_Y=None, title='', block=True):
 	# count the data
 	n = len(Y)		# the number of observations
 	m = len(Y[0])	# the number of observation locations
-	# m=min(2,m)
+	m=min(1,m)
 
 	# create a Figure instance
 	fig = plt.figure()
@@ -24,12 +24,12 @@ def plot(Y, pred_Y=None, title='', block=True):
 	Yt = Y.transpose()
 	if pred_Y == None:
 		for i in xrange(m):
-			ax[i].plot(numpy.array(xrange(n)), Yt[i], "r.-")
+			ax[i].plot(numpy.array(xrange(n)), Yt[i], "b.-")
 	else:
 		pred_Yt = pred_Y.transpose()
 		for i in xrange(m):
-			ax[i].plot(numpy.array(xrange(n)), Yt[i], "r.-")
-			ax[i].plot(numpy.array(xrange(n)), pred_Yt[i], "b.-")
+			ax[i].plot(numpy.array(xrange(n)), Yt[i], "b.-")
+			ax[i].plot(numpy.array(xrange(n)), pred_Yt[i], "r.-")
 
 	plt.title(title)
 	plt.show(block=block)
