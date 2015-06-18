@@ -10,7 +10,7 @@ def plot(Y, pred_Y=None, title='', block=True):
 	# count the data
 	n = len(Y)		# the number of observations
 	m = len(Y[0])	# the number of observation locations
-	m=min(1,m)
+	#m=min(1,m)
 
 	# create a Figure instance
 	fig = plt.figure()
