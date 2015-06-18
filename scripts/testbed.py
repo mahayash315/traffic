@@ -150,7 +150,7 @@ class TestBed:
 def test_networks():
     # testbed をつくる
     # bed = TestBed("../data/lane.180000.3.xml", r=2, d=1)
-    bed = TestBed("/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full_3/lane.xml", r=2, d=1, debug_level=2)
+    bed = TestBed("../data/cross3ltl_full_3/lane.129600.xml", r=2, d=1, debug_level=2)
     n_input = bed.get_n_input()
     n_output = bed.get_n_outupt()
 
