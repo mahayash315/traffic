@@ -133,6 +133,7 @@ class TestBed:
                 train(learning_rate, momentum, test)
                 learning_rate *= 0.1
                 momentum += 9.0/pow(10,i+2)
+                momentum = min(momentum, 0.999999999999)
             if (1 <= self.debug_level):
                 print('done')
 
@@ -187,11 +188,24 @@ def test_networks():
         optimize='sgd',
         activation='linear'
     )
+    # exp4 = theanets.Experiment(
+    #     theanets.feedforward.Regressor,
+    #     layers=(
+    #         n_input,
+    #         dict(size=400, activation='linear'),
+    #         dict(size=400, activation='linear'),
+    #         dict(size=400, activation='linear'),
+    #         n_output
+    #     ),
+    #     optimize='sgd',
+    #     activation='linear'
+    # )
 
     # 実験する
-    bed.test(exp1, 10)
-    bed.test(exp2, 15)
+    # bed.test(exp1, 10)
+    # bed.test(exp2, 15)
     bed.test(exp3, 20, block=True)
+    # bed.test(exp4, 20, block=True)
 
     # ブロック
     # print raw_input("何かキーを押すと終了")
