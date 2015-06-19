@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 import plot
 
-def load_data(dataset, r=0, d=1):
+def load_data(dataset, r=0, d=1, debug_level=0):
     ''' Loads the dataset
 
     :type dataset: string
@@ -32,7 +32,8 @@ def load_data(dataset, r=0, d=1):
             density = float(lane.get('density'))
             return (speed * density / 3.6)
         except:
-            print('warning: no valid data at interval={}, lane={}'.format(idx_intr,idx_lane))
+            if 1 <= debug_level:
+                print('warning: no valid data at interval={}, lane={}'.format(idx_intr,idx_lane))
             #if 0 < idx_intr:
             #    return f(idx_intr-1, idx_lane)
             return 0
@@ -64,7 +65,7 @@ def load_data(dataset, r=0, d=1):
 
 if __name__ == '__main__':
     try:
-        dataset = load_data('/Users/masayuki/git/traffic/data/lane.180000.3.xml',r=0,d=1)
+        dataset = load_data('../data/lane.180000.3.xml',r=0,d=1)
         print('success')
         dataset_x, dataset_y = dataset
         plot.plot(dataset_y)

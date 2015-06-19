@@ -26,8 +26,8 @@ class TestBed:
         dataset_x, dataset_y = traffic.load_data(filename, r=r, d=d)
 
         # cut the dataset for training, testing, validation
-        cut1 = int(0.5 * len(dataset_x)) # 80% for training
-        cut2 = int(0.6 * len(dataset_x)) # 10% for validation, 10% for testing
+        cut1 = int(0.8 * len(dataset_x)) # 80% for training
+        cut2 = int(0.9 * len(dataset_x)) # 10% for validation, 10% for testing
         idx = range(0, len(dataset_x))
         numpy.random.shuffle(idx)
         train = idx[:cut1]
@@ -108,10 +108,12 @@ class TestBed:
                     print("MAE = {}".format(mae))
                     print("MRE = {}%".format(mre*100.0))
 
-                return pred_y
+                return pred_y, mae, mre
 
             def test_and_plot(train=None, valid=None, block=False):
-                pred_y = test(train=train, valid=valid)
+                pred_y, mae, mre = test(train=train, valid=valid)
+                print("MAE = {}".format(mae))
+                print("MRE = {}%".format(mre*100.0))
                 plot.plot(test_set_y, pred_y, block=block)
 
 
@@ -150,7 +152,7 @@ class TestBed:
 def test_networks():
     # testbed をつくる
     # bed = TestBed("../data/lane.180000.3.xml", r=2, d=1)
-    bed = TestBed("../data/cross3ltl_full_3/lane.129600.xml", r=2, d=1, debug_level=2)
+    bed = TestBed("../data/cross3ltl_full_3/lane.129600.xml", r=2, d=1, debug_level=0)
     n_input = bed.get_n_input()
     n_output = bed.get_n_outupt()
 
