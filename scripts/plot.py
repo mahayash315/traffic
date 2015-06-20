@@ -37,9 +37,10 @@ def plot(Y, pred_Y=None, title='', block=True):
 class Plotter:
 	def __init__(self):
 		self.fig = None
-		self.ax = None
-		self.plot_y = None
-		self.plot_pred_y = None
+		self.axs = None
+		self.plots = None
+		self.xs = None
+		self.ys = None
 		self.last_x = -1
 
 	def drawFrame(self):
@@ -47,47 +48,45 @@ class Plotter:
 			self.fig = plt.figure()
 			plt.show(block=False)
 
-	def appendFirst(self, y, pred_y=None):
-		m = len(y)	# the number of observation locations
+	def initDraw(self, m):
+		self.xs = [ [], [] ]	# y, pred_y
+		self.ys = [ [[], []] for _ in xrange(m) ]
+		self.axs = []
+		self.plots = []
 
-		# create axes
-		ax = []
+		# create axes and plots
 		for i in xrange(m):
-			ax.append(self.fig.add_subplot(m,1,i+1))
+			ax = self.fig.add_subplot(m,1,i+1)
+			plot_y = ax.plot(self.xs[0], self.ys[i][0], "b.-")[0]
+			plot_pred_y = ax.plot(self.xs[1], self.ys[i][1], "r.-")[0]
+			self.axs.append(ax)
+			self.plots.append([plot_y, plot_pred_y])
 
-		# plot the data
-		plot_y = []
-		plot_pred_y = []
-		yt = y.transpose()
-		if pred_y == None:
-			for i in xrange(m):
-				plot_y.extend(ax[i].plot(np.array([0]), yt[i], "b.-"))
-		else:
-			pred_yt = pred_y.transpose()
-			for i in xrange(m):
-				plot_y.extend(ax[i].plot(np.array([0]), yt[i], "b.-"))
-				plot_pred_y.extend(ax[i].plot(np.array([0]), pred_yt[i], "r.-"))
-
-		self.ax = ax
-		self.plot_y = plot_y
-		self.plot_pred_y = plot_pred_y
-		self.last_x = 0
+		plt.draw()
 
 	def append(self, y, pred_y=None):
 		if (self.fig == None):
 			self.drawFrame()
+			self.initDraw(len(y))
 
-		if (self.last_x == -1):
-			self.appendFirst(y, pred_y)
-		else:
-			x = self.last_x + 1
-			for i in xrange(len(self.ax)):
-				plot_y = self.plot_y[i]
-				# plot_pred_y = self.plot_pred_y[i] # FIXME: to be fixed later
-				plot_y.set_xdata(np.append(plot_y.get_xdata(), x))
-				plot_y.set_ydata(np.append(plot_y.get_ydata(), y[i]))
-				# plot_pred_y.set_xdata(np.append(plot_pred_y.get_xdata(), x))
-				# plot_pred_y.set_ydata(np.append(plot_pred_y.get_ydata(), y[i]))
-			self.last_x = x
+		x = self.last_x + 1
+		self.xs[0].append(x)
+		if (pred_y != None):
+			self.xs[1].append(x)
+		self.last_x = x
+
+		for i in xrange(len(self.axs)):
+			self.ys[i][0].append(y[i])
+			if (pred_y != None):
+				self.ys[i][1].append(pred_y[i])
+
+		self.update()
+
+	def update(self):
+		for i in xrange(len(self.axs)):
+			self.plots[i][0].set_data(self.xs[0], self.ys[i][0])
+			self.plots[i][1].set_data(self.xs[1], self.ys[i][1])
+			self.axs[i].relim()
+			self.axs[i].autoscale_view()
 
 		plt.draw()

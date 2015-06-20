@@ -1,5 +1,6 @@
 import math
 import random
+import time
 import numpy as np
 import plot as plt
 
@@ -50,5 +51,6 @@ if __name__ == '__main__':
         for y in gen:
             print("{}".format(y))
             plotter.append(y)
+            time.sleep(0.5)
     except Exception as e:
         print(str(e))
