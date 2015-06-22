@@ -16,8 +16,8 @@ class Plotter:
 			plt.show(block=False)
 
 	def initDraw(self, m):
-		self.xs = [ [], [] ]	# y, pred_y
-		self.ys = [ [[], []] for _ in xrange(m) ]
+		self.xs = ( [], [] )	# xdata, pred_xdata
+		self.ys = [ ([], []) for _ in xrange(m) ] # ydata, pred_ydata
 		self.axs = []
 		self.plots = []
 
@@ -37,15 +37,17 @@ class Plotter:
 			self.initDraw(len(y))
 
 		x = self.last_x + 1
-		self.xs[0].append(x)
+		xdata, pred_xdata = self.xs
+		xdata.append(x)
 		if (pred_y != None):
-			self.xs[1].append(x)
+			pred_xdata.append(x)
 		self.last_x = x
 
 		for i in xrange(len(self.axs)):
-			self.ys[i][0].append(y[i])
+			ydata, pred_ydata = self.ys[i]
+			ydata.append(y[i])
 			if (pred_y != None):
-				self.ys[i][1].append(pred_y[i])
+				pred_ydata.append(pred_y[i])
 
 		self.update()
 
