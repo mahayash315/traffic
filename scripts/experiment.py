@@ -41,6 +41,9 @@ import plot
 #     rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)]
 #     return rval
 
+# 標準化のために割る値, FIXME: 本当は各レーンの最大 Traffic Volume で割って標準化したデータを使うべき
+DATA_DIVIDE_VALUE = 100
+
 class Experiment:
     def __init__(self, r=0, d=1, debug_level=0):
         self.debug_level = debug_level
@@ -60,8 +63,8 @@ class Experiment:
         dataset_x, dataset_y = traffic.load_data(filename, r=self.r, d=self.d)
 
         # NORMALIZE
-        dataset_x = numpy.divide(dataset_x, 100)
-        dataset_y = numpy.divide(dataset_y, 100)
+        dataset_x = numpy.divide(dataset_x, DATA_DIVIDE_VALUE)
+        dataset_y = numpy.divide(dataset_y, DATA_DIVIDE_VALUE)
 
         # cut the dataset
         cut = int(0.8 * len(dataset_x)) # 80% for training, 20% for validating
@@ -84,8 +87,8 @@ class Experiment:
         dataset_x, dataset_y = traffic.load_data(filename, r=self.r, d=self.d)
 
         # NORMALIZE
-        dataset_x = numpy.divide(dataset_x, 100)
-        dataset_y = numpy.divide(dataset_y, 100)
+        dataset_x = numpy.divide(dataset_x, DATA_DIVIDE_VALUE)
+        dataset_y = numpy.divide(dataset_y, DATA_DIVIDE_VALUE)
 
         # set the dataset
         self.testdata = (dataset_x, dataset_y)
@@ -102,7 +105,29 @@ class Experiment:
         '''
         return self.n_output
 
-    def train(self, exp, n=10, do_pretrain=True):
+    def pretrain(self, exp):
+        '''
+        与えられたネットワーク exp を事前学習する
+        :param exp:
+        :return:
+        '''
+        train_set_x, train_set_y = self.traindata
+        valid_set_x, valid_set_y = self.validdata
+
+        def pretrain():
+            train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
+            if (2 <= self.debug_level):
+                print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
+
+        # pretrain the model
+        if (1 <= self.debug_level):
+            print('pretraining...')
+            sys.stdout.flush()
+        pretrain()
+        if (1 <= self.debug_level):
+            print('done')
+
+    def train(self, exp, n=10):
         '''
         与えたネットワーク exp で学習を行う
         :param exp: ネットワーク
@@ -113,26 +138,12 @@ class Experiment:
         train_set_x, train_set_y = self.traindata
         valid_set_x, valid_set_y = self.validdata
 
-        def pretrain():
-            train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
-            if (2 <= self.debug_level):
-                print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
-
         def train(learning_rate=0.01, momentum=0.9, callback=None):
             for train, valid in exp.itertrain(self.traindata, self.validdata, learning_rate=learning_rate, momentum=momentum):
                 if (2 <= self.debug_level):
                     print(' ({},{}): train[loss]={}, valid[loss]={}'.format(learning_rate, momentum, train['loss'], valid['loss']))
             if callable(callback):
                 callback(train=train, valid=valid)
-
-        # pretrain the model
-        if do_pretrain:
-            if (1 <= self.debug_level):
-                print('pretraining...')
-                sys.stdout.flush()
-            pretrain()
-            if (1 <= self.debug_level):
-                print('done')
 
         # train the model
         if (1 <= self.debug_level):
@@ -205,18 +216,25 @@ def test_networks():
         layers=(
             n_input,
             dict(size=100, activation='linear'),
+            dict(size=100, activation='linear'),
             n_output
         ),
         optimize='sgd',
         activation='linear'
     )
 
-    # 学習
-    bed.train(exp1, 1, True)
+    # 事前学習
+    bed.pretrain(exp1)
 
-    # 評価
+    # 学習と評価
+    bed.train(exp1, 1)
+    bed.test(exp1, False)
+
+    bed.train(exp1, 1)
+    bed.test(exp1, False)
+
+    bed.train(exp1, 1)
     bed.test(exp1, True)
-
 
 if __name__ == '__main__':
     try:
