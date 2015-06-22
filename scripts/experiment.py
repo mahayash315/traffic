@@ -182,8 +182,8 @@ def test_networks():
     bed = Experiment(r=2, d=1, debug_level=2)
 
     # データ準備
-    bed.setTrainData("../data/lane.180000.2.xml")
-    bed.setTestData("../data/lane.180000.3.xml")
+    bed.setTrainData("../data/cross3ltl_full_3/lane.129600.1.xml")
+    bed.setTestData("../data/cross3ltl_full_3/lane.129600.2.xml")
 
     # ネットワーク作成準備
     n_input = bed.get_n_input()

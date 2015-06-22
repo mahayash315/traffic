@@ -36,7 +36,7 @@ class SimpleGenerator(Generator):
         arr = [0 for _ in xrange(self.num)]
         for l in xrange(self.num):
             arr[l] = self.itrgenerate(x, l)
-        return np.array(arr)
+        return arr
 
     def next(self):
         x = self.i

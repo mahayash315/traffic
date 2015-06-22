@@ -218,6 +218,6 @@ if __name__ == '__main__':
     runtime.load_net('/Users/masayuki/traffic/sumo-0.23.0/docs/examples/sumo/output/cross3ltl_full_3/net.net.xml')
     runtime.set_time(0, 129600)
     runtime.generate_routes(10, 5)
-    runtime.generate_flows(2)
+    runtime.generate_flows(90)
     xml = runtime.to_xml()
     print(xml)
