@@ -58,6 +58,12 @@ class Experiment:
     def setTrainData(self, filename):
         # load the dataset
         dataset_x, dataset_y = traffic.load_data(filename, r=self.r, d=self.d)
+
+        # NORMALIZE
+        dataset_x = numpy.divide(dataset_x, 100)
+        dataset_y = numpy.divide(dataset_y, 100)
+
+        # cut the dataset
         cut = int(0.8 * len(dataset_x)) # 80% for training, 20% for validating
         idx = range(0, len(dataset_x))
         numpy.random.shuffle(idx)
@@ -76,6 +82,10 @@ class Experiment:
     def setTestData(self, filename):
         # load the dataset
         dataset_x, dataset_y = traffic.load_data(filename, r=self.r, d=self.d)
+
+        # NORMALIZE
+        dataset_x = numpy.divide(dataset_x, 100)
+        dataset_y = numpy.divide(dataset_y, 100)
 
         # set the dataset
         self.testdata = (dataset_x, dataset_y)
@@ -202,7 +212,7 @@ def test_networks():
     )
 
     # 学習
-    bed.train(exp1, 10, True)
+    bed.train(exp1, 1, True)
 
     # 評価
     bed.test(exp1, True)
