@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-class Plotter:
+class Visualizer:
 	def __init__(self):
 		self.fig = None
 		self.axs = None

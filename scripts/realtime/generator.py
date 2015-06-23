@@ -2,7 +2,7 @@ import math
 import random
 import time
 import numpy as np
-import plot as plt
+import visualizer as plt
 
 
 class Generator(object):
@@ -46,11 +46,11 @@ class SimpleGenerator(Generator):
 
 if __name__ == '__main__':
     try:
-        plotter = plt.Plotter()
+        vis = plt.Visualizer()
         gen = SimpleGenerator()
         for y in gen:
             print("{}".format(y))
-            plotter.append(y)
+            vis.append(y)
             time.sleep(0.5)
     except Exception as e:
         print(str(e))

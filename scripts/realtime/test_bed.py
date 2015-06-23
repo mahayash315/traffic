@@ -3,7 +3,7 @@ import time
 import numpy as np
 import theano
 from theano import tensor as T
-import plot as plt
+import visualizer as plt
 
 class TestBed:
     def __init__(self):
