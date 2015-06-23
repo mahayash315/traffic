@@ -54,6 +54,7 @@ class Experiment:
         self.traindata = None
         self.validdata = None
         self.testdata = None
+        self.learning_rates = {}
 
     def setDebug(self, debug_level):
         self.debug_level = debug_level
@@ -69,7 +70,7 @@ class Experiment:
         # cut the dataset
         cut = int(0.8 * len(dataset_x)) # 80% for training, 20% for validating
         idx = range(0, len(dataset_x))
-        numpy.random.shuffle(idx)
+        # numpy.random.shuffle(idx)
         train = idx[:cut]
         valid = idx[cut:]
 
@@ -149,12 +150,15 @@ class Experiment:
         if (1 <= self.debug_level):
             print('training...')
         learning_rate = 0.1
+        if self.learning_rates.has_key(exp):
+            learning_rate = self.learning_rates[exp]
         momentum = 0.9
         for i in xrange(n):
             train(learning_rate, momentum, None)
             learning_rate *= 0.1
             #momentum += 9.0/pow(10,i+2)
             #momentum = min(momentum, 0.999999999999)
+        self.learning_rates[exp] = learning_rate
         if (1 <= self.debug_level):
             print('done')
 
@@ -216,7 +220,6 @@ def test_networks():
         layers=(
             n_input,
             dict(size=100, activation='linear'),
-            dict(size=100, activation='linear'),
             n_output
         ),
         optimize='sgd',
@@ -227,7 +230,7 @@ def test_networks():
     bed.pretrain(exp1)
 
     # 学習と評価
-    bed.train(exp1, 1)
+    bed.train(exp1, 5)
     bed.test(exp1, False)
 
     bed.train(exp1, 1)
