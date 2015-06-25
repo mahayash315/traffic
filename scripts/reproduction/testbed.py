@@ -4,7 +4,7 @@ import time
 
 import theano
 import numpy
-import SdA
+from SdA import SdA
 
 from pems import load_data
 
@@ -22,13 +22,13 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     train = idx[:cut]
     valid = idx[cut:]
 
-    train_set_x = dataset_x[train]
-    train_set_y = dataset_y[train]
-    valid_set_x = dataset_y[valid]
-    valid_set_y = dataset_y[valid]
+    train_set_x = theano.shared(dataset_x[train], borrow=True)
+    train_set_y = theano.shared(dataset_y[train], borrow=True)
+    valid_set_x = theano.shared(dataset_y[valid], borrow=True)
+    valid_set_y = theano.shared(dataset_y[valid], borrow=True)
 
     # compute number of minibatches for training, validation and testing
-    n_train_batches = train_set_x.shape[0]
+    n_train_batches = train_set_x.get_value(borrow=True).shape[0]
     n_train_batches /= batch_size
 
     # numpy random generator
