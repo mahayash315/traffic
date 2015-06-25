@@ -16,7 +16,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
     dataset_x, dataset_y = datasets
 
-    idx = range(0, dataset_x.shape[1])
+    idx = range(0, dataset_x.shape[0])
     numpy.random.shuffle(idx)
     cut = int(0.8 * len(idx))
     train = idx[:cut]

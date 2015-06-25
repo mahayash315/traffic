@@ -34,8 +34,8 @@ def load_data(filename, from_day=0, days=60, r=0, d=1):
     m = dataset.shape[1] # number of observation location
     n = dataset.shape[0] # number of observation samples per location
 
-    dataset_x = [[dataset[(j-(i%(r+1)))][int(i/(r+1))] for j in xrange(r,n-d)] for i in xrange(m*(r+1))]
-    dataset_y = [[dataset[j][i] for j in xrange(r+d,n)] for i in xrange(m)]
+    dataset_x = [[dataset[(j-(i%(r+1)))][int(i/(r+1))] for i in xrange(m*(r+1))] for j in xrange(r,n-d)]
+    dataset_y = [[dataset[i][j] for j in xrange(m)] for i in xrange(r+d,n)]
 
     return (numpy.asarray(dataset_x, dtype=theano.config.floatX), numpy.asarray(dataset_y, dtype=theano.config.floatX))
 
