@@ -70,7 +70,7 @@ class Experiment:
         # cut the dataset
         cut = int(0.8 * len(dataset_x)) # 80% for training, 20% for validating
         idx = range(0, len(dataset_x))
-        # numpy.random.shuffle(idx)
+        numpy.random.shuffle(idx)
         train = idx[:cut]
         valid = idx[cut:]
 
@@ -140,7 +140,7 @@ class Experiment:
         valid_set_x, valid_set_y = self.validdata
 
         def train(learning_rate=0.01, momentum=0.9, callback=None):
-            for train, valid in exp.itertrain(self.traindata, self.validdata, learning_rate=learning_rate, momentum=momentum):
+            for train, valid in exp.itertrain(self.traindata, self.validdata, learning_rate=learning_rate, momentum=momentum, algorithm='adam'):
                 if (2 <= self.debug_level):
                     print(' ({},{}): train[loss]={}, valid[loss]={}'.format(learning_rate, momentum, train['loss'], valid['loss']))
             if callable(callback):
@@ -219,18 +219,20 @@ def test_networks():
         theanets.feedforward.Regressor,
         layers=(
             n_input,
-            dict(size=100, activation='linear'),
+            dict(size=120, activation='relu'),
+            dict(size=120, activation='relu'),
+            dict(size=120, activation='relu'),
             n_output
         ),
         optimize='sgd',
-        activation='linear'
+        activation='sigmoid'
     )
 
     # 事前学習
     bed.pretrain(exp1)
 
     # 学習と評価
-    bed.train(exp1, 5)
+    bed.train(exp1, 1)
     bed.test(exp1, False)
 
     bed.train(exp1, 1)
