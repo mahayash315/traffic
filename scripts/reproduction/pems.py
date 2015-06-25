@@ -33,7 +33,7 @@ def load_data(filename, from_day=0, days=60, r=0, d=1):
     m = dataset.shape[0] # number of observation location
     n = dataset.shape[1] # number of observation samples per location
 
-    dataset_x = [[dataset[int(i/r)][(j+r)-(i%r)] for j in xrange(r,n-d)] for i in xrange(m*r)]
+    dataset_x = [[dataset[int(i/(r+1))][(j-(i%(r+1)))] for j in xrange(r,n-d)] for i in xrange(m*(r+1))]
     dataset_y = [[dataset[i][j] for j in xrange(r+d,n)] for i in xrange(m)]
 
     return (np.asarray(dataset_x, dtype=np.float32), np.asarray(dataset_y, dtype=np.float32))

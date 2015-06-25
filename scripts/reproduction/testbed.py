@@ -12,7 +12,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
              pretrain_lr=0.01, pretraining_epochs=15,
              batch_size=1):
     # load dataset
-    datasets = load_data("../../data/PEMS-SF/PEMS_train", from_day=0, days=60, r=0, d=1)
+    datasets = load_data("../../data/PEMS-SF/PEMS_train", from_day=0, days=2, r=1, d=1)
 
     dataset_x, dataset_y = datasets
 
@@ -24,11 +24,11 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
     train_set_x = dataset_x[train]
     train_set_y = dataset_y[train]
-    valid_set_y = dataset_y[valid]
+    valid_set_x = dataset_y[valid]
     valid_set_y = dataset_y[valid]
 
     # compute number of minibatches for training, validation and testing
-    n_train_batches = train_set_x.get_value(borrow=True).shape[0]
+    n_train_batches = train_set_x.shape[0]
     n_train_batches /= batch_size
 
     # numpy random generator
@@ -157,7 +157,4 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
 
 if __name__ == '__main__':
-    try:
-        test_SdA()
-    except Exception as e:
-        print("{}".format(e))
+    test_SdA()
