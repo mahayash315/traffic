@@ -34,6 +34,9 @@ def test_theanets():
     train_set = (train_set_x, train_set_y)
     valid_set = (valid_set_x, valid_set_y)
 
+    n_input = dataset_x.shape[1]
+    n_output = dataset_y.shape[1]
+
     def pretrain(exp):
         print('pretraining...')
         train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
@@ -62,14 +65,11 @@ def test_theanets():
 
         return pred_y, mae, mre
 
-    def test_and_plot(block=False):
-        pred_y, mae, mre = test()
+    def test_and_plot(exp, max_m=n_output, block=False):
+        pred_y, mae, mre = test(exp)
         print("MAE = {}".format(mae))
         print("MRE = {}%".format(mre*100.0))
-        plot.plot(test_set_y, pred_y, block=block)
-
-    n_input = dataset_x.shape[1]
-    n_output = dataset_y.shape[1]
+        plot.plot(test_set_y, pred_y, max_m=max_m, block=block)
 
     # 実験用のネットワークを作る
     exp1 = theanets.Experiment(
@@ -88,7 +88,7 @@ def test_theanets():
     # train the model
     pretrain(exp1)
     train(exp1)
-    test_and_plot(exp1, block=True)
+    test_and_plot(exp1, max_m=2, block=True)
 
 
 def test_SdA(finetune_lr=0.1, training_epochs=1000,
@@ -96,8 +96,10 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
              batch_size=1):
     # load dataset
     datasets = load_data("../../data/PEMS-SF/PEMS_train", from_day=0, days=2, r=1, d=1)
+    datasets2 = load_data("../../data/PEMS-SF/PEMS_test", from_day=0, days=2, r=1, d=1)
 
     dataset_x, dataset_y = datasets
+    dataset2_x, dataset2_y = datasets2
 
     idx = range(0, dataset_x.shape[0])
     numpy.random.shuffle(idx)
@@ -109,6 +111,15 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     train_set_y = theano.shared(dataset_y[train], borrow=True)
     valid_set_x = theano.shared(dataset_x[valid], borrow=True)
     valid_set_y = theano.shared(dataset_y[valid], borrow=True)
+    test_set_x = theano.shared(dataset2_x, borrow=True)
+    test_set_y = theano.shared(dataset2_y, borrow=True)
+
+    train_set = (train_set_x, train_set_y)
+    valid_set = (valid_set_x, valid_set_y)
+    test_set = (test_set_x, test_set_y)
+
+    n_input = dataset_x.shape[1]
+    n_output = dataset_y.shape[1]
 
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0]
@@ -121,12 +132,12 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     # construct the stacked denoising autoencoder class
     sda = SdA(
         numpy_rng=numpy_rng,
-        n_ins=dataset_x.shape[0],
+        n_ins=n_input,
         hidden_layers_sizes=[1000, 1000, 1000],
-        n_outs=dataset_y.shape[0]
+        n_outs=n_output
     )
 
-
+    '''
     #########################
     # PRETRAINING THE MODEL #
     #########################
@@ -152,7 +163,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     end_time = time.clock()
 
     print >> sys.stderr, ('The pretraining code for file ' + os.path.split(__file__)[1] + ' ran for %.2fm' % ((end_time - start_time) / 60.))
-
+    '''
 
     ########################
     # FINETUNING THE MODEL #
@@ -161,7 +172,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     # get the training, validation and testing function for the model
     print '... getting the finetuning functions'
     train_fn, validate_model, test_model = sda.build_finetune_functions(
-        datasets=datasets,
+        datasets=(train_set, valid_set, test_set),
         batch_size=batch_size,
         learning_rate=finetune_lr
     )
@@ -240,5 +251,5 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
 
 if __name__ == '__main__':
-    test_theanets()
-    #test_SdA()
+    # test_theanets()
+    test_SdA()

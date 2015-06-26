@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot(Y, pred_Y=None, title='', block=True):
+def plot(Y, pred_Y=None, title='', max_m=None, block=True):
 	''' Plot the actual Y and predicted Y
 
     :param Y: n-by-m actual data
@@ -10,7 +10,8 @@ def plot(Y, pred_Y=None, title='', block=True):
 	# count the data
 	n = len(Y)		# the number of observations
 	m = len(Y[0])	# the number of observation locations
-	m=min(2,m)
+	if (max_m != None):
+		m=min(max_m,m)
 
 	# create a Figure instance
 	fig = plt.figure()
