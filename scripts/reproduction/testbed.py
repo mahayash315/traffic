@@ -62,8 +62,8 @@ def test_theanets():
 
         return pred_y, mae, mre
 
-    def test_and_plot(train=None, valid=None, block=False):
-        pred_y, mae, mre = test(train=train, valid=valid)
+    def test_and_plot(block=False):
+        pred_y, mae, mre = test()
         print("MAE = {}".format(mae))
         print("MRE = {}%".format(mre*100.0))
         plot.plot(test_set_y, pred_y, block=block)
