@@ -36,8 +36,8 @@ def test_theanets():
 
     def pretrain(exp):
         print('pretraining...')
-        for train, valid in exp.train(train_set_x, valid_set_x, optimize='pretrain'):
-            print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
+        train, valid = exp.train(train_set_x, valid_set_x, optimize='pretrain')
+        print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
 
     def train(exp, learning_rate=0.1, momentum=0.9):
         print('training...')
