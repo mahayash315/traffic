@@ -41,6 +41,7 @@ from theano.tensor.shared_randomstreams import RandomStreams
 
 from logistic_sgd import LogisticRegression, load_data
 from mlp import HiddenLayer
+from sgd import LinearRegression
 from dA import dA
 
 
@@ -159,22 +160,22 @@ class SdA(object):
             self.dA_layers.append(dA_layer)
         # end-snippet-2
         # We now need to add a logistic layer on top of the MLP
-        self.logLayer = LogisticRegression(
+        self.linLayer = LinearRegression(
             input=self.sigmoid_layers[-1].output,
             n_in=hidden_layers_sizes[-1],
             n_out=n_outs
         )
 
-        self.params.extend(self.logLayer.params)
+        self.params.extend(self.linLayer.params)
         # construct a function that implements one step of finetunining
 
         # compute the cost for second phase of training,
         # defined as the negative log likelihood
-        self.finetune_cost = self.logLayer.negative_log_likelihood(self.y)
+        self.finetune_cost = self.linLayer.errors(self.y)
         # compute the gradients with respect to the model parameters
         # symbolic variable that points to the number of errors made on the
         # minibatch given by self.x and self.y
-        self.errors = self.logLayer.errors(self.y)
+        self.errors = self.linLayer.errors(self.y)
 
     def pretraining_functions(self, train_set_x, batch_size):
         ''' Generates a list of functions, each of them implementing one
