@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import time
@@ -6,7 +7,89 @@ import theano
 import numpy
 from SdA import SdA
 
+import theanets
+
 from pems import load_data
+import plot
+
+def test_theanets():
+    # load dataset
+    datasets = load_data("../../data/PEMS-SF/PEMS_train", from_day=0, days=2, r=1, d=1)
+    datasets2 = load_data("../../data/PEMS-SF/PEMS_test", from_day=0, days=2, r=1, d=1)
+
+    dataset_x, dataset_y = datasets
+
+    idx = range(0, dataset_x.shape[0])
+    numpy.random.shuffle(idx)
+    cut = int(0.8 * len(idx))
+    train = idx[:cut]
+    valid = idx[cut:]
+
+    train_set_x = dataset_x[train]
+    train_set_y = dataset_y[train]
+    valid_set_x = dataset_x[valid]
+    valid_set_y = dataset_y[valid]
+    test_set_x, test_set_y = datasets2
+
+    train_set = (train_set_x, train_set_y)
+    valid_set = (valid_set_x, valid_set_y)
+
+    def pretrain(exp):
+        print('pretraining...')
+        for train, valid in exp.train(train_set_x, valid_set_x, optimize='pretrain'):
+            print(' : train[loss]={}, valid[loss]={}'.format(train['loss'], valid['loss']))
+
+    def train(exp, learning_rate=0.1, momentum=0.9):
+        print('training...')
+        for train, valid in exp.itertrain(train_set, valid_set, learning_rate=learning_rate, momentum=momentum):
+            print(' ({},{}): train[loss]={}, valid[loss]={}'.format(learning_rate, momentum, train['loss'], valid['loss']))
+
+    def test(exp):
+        pred_y = exp.network.predict(test_set_x)
+
+        # calculate Mean Absolute Percentage Error (MAPE)
+        E = test_set_y - pred_y
+        absE = numpy.absolute(E)
+        mx = numpy.sum(test_set_x) / (test_set_x.shape[0] * test_set_x.shape[1]) # mean of X
+        mae = numpy.sum(absE) / (absE.shape[0] * absE.shape[1])
+        mre = mae / mx
+
+        # print("Y = \n{}".format(test_set_y))
+        # print("Y(pred) = \n{}".format(pred_y))
+        # print("E = \n{}".format(E))
+        print("MAE = {}".format(mae))
+        print("MRE = {}%".format(mre*100.0))
+
+        return pred_y, mae, mre
+
+    def test_and_plot(train=None, valid=None, block=False):
+        pred_y, mae, mre = test(train=train, valid=valid)
+        print("MAE = {}".format(mae))
+        print("MRE = {}%".format(mre*100.0))
+        plot.plot(test_set_y, pred_y, block=block)
+
+    n_input = dataset_x.shape[1]
+    n_output = dataset_y.shape[1]
+
+    # 実験用のネットワークを作る
+    exp1 = theanets.Experiment(
+        theanets.feedforward.Regressor,
+        layers=(
+            n_input,
+            dict(size=100, activation='linear'),
+            dict(size=100, activation='linear'),
+            dict(size=100, activation='linear'),
+            n_output
+        ),
+        optimize='sgd',
+        activation='linear'
+    )
+
+    # train the model
+    pretrain(exp1)
+    train(exp1)
+    test_and_plot(exp1, block=True)
+
 
 def test_SdA(finetune_lr=0.1, training_epochs=1000,
              pretrain_lr=0.01, pretraining_epochs=15,
@@ -24,7 +107,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
     train_set_x = theano.shared(dataset_x[train], borrow=True)
     train_set_y = theano.shared(dataset_y[train], borrow=True)
-    valid_set_x = theano.shared(dataset_y[valid], borrow=True)
+    valid_set_x = theano.shared(dataset_x[valid], borrow=True)
     valid_set_y = theano.shared(dataset_y[valid], borrow=True)
 
     # compute number of minibatches for training, validation and testing
@@ -157,4 +240,5 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
 
 if __name__ == '__main__':
-    test_SdA()
+    test_theanets()
+    #test_SdA()
