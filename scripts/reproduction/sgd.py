@@ -36,16 +36,22 @@ class LinearRegression(object):
         """
         # start-snippet-1
         if W is None:
-            W_values = numpy.asarray(
-                rng.uniform(
-                    low=-numpy.sqrt(6. / (n_in + n_out)),
-                    high=numpy.sqrt(6. / (n_in + n_out)),
-                    size=(n_in, n_out)
-                ),
+            W_values = numpy.zeros(
+                (n_in, n_out),
                 dtype=theano.config.floatX
             )
-            if activation == theano.tensor.nnet.sigmoid:
-                W_values *= 4
+
+            # FIXME: better to initialize with the following weight
+            # W_values = numpy.asarray(
+            #     rng.uniform(
+            #         low=-numpy.sqrt(6. / (n_in + n_out)),
+            #         high=numpy.sqrt(6. / (n_in + n_out)),
+            #         size=(n_in, n_out)
+            #     ),
+            #     dtype=theano.config.floatX
+            # )
+            # if activation == theano.tensor.nnet.sigmoid:
+            #     W_values *= 4
 
             W = theano.shared(value=W_values, name='W', borrow=True)
 

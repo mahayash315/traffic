@@ -87,7 +87,7 @@ def main():
     os.chdir(output_folder)
 
     # load dataset
-    datasets = load_data(train_days=2, test_days=2, r=2, d=1)
+    datasets = load_data()
 
     train_set_x, train_set_y = util.shared_dataset(datasets[0])
     valid_set_x, valid_set_y = util.shared_dataset(datasets[1])
@@ -244,22 +244,26 @@ def main():
         plot.savefig(filename, test_set_x, y_pred, indexes=[i])
 
 def load_data(r=2, d=1):
-    datasets1 = pems.load_data("../../data/PEMS-SF/PEMS_train", from_day=train_from_day, days=train_days, r=r, d=d)
-    datasets2 = pems.load_data("../../data/PEMS-SF/PEMS_train", from_day=test_from_day, days=test_days, r=r, d=d)
+    datasets = pems.load_data("../../data/PEMS-SF/PEMS_sorted", from_day=0, days=90, r=r, d=d)
 
     dataset_x, dataset_y = util.numpy_dataset(datasets)
 
     idx = range(0, dataset_x.shape[0])
-    numpy.random.shuffle(idx)
-    cut = int(0.8 * len(idx))
-    train = idx[:cut]
-    valid = idx[cut:]
+    cut1= int(0.6 * len(idx))
+    trainvalid = idx[:cut1]
+    test = idx[cut1:]
+
+    numpy.random.shuffle(trainvalid)
+    cut2 = int(0.8 * len(trainvalid))
+    train = trainvalid[:cut2]
+    valid = trainvalid[cut2:]
 
     train_set_x = dataset_x[train]
     train_set_y = dataset_y[train]
     valid_set_x = dataset_x[valid]
     valid_set_y = dataset_y[valid]
-    test_set_x, test_set_y = datasets2
+    test_set_x = dataset_x[test]
+    test_set_y = dataset_y[test]
 
     return ((train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y))
 
