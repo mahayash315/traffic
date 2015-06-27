@@ -21,14 +21,14 @@ class SimpleGenerator(Generator):
         self.num = num
         self.i = 0
 
-    def f(self, x):
-        return math.sin(x / math.pi)
-
     def noise(self, x):
         return (random.random() * 0.1)
 
     def itrgenerate(self, x, l):
-        y = self.f(x)
+        if l % 2 == 0:
+            y = math.sin(x / math.pi)
+        else:
+            y = math.cos(x / math.pi)
         y += self.noise(x)
         return y
 

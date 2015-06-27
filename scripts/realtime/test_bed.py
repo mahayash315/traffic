@@ -77,26 +77,33 @@ class TestBed:
                 print(" epoch {}: cost={}".format(epoch, minibatch_avg_cost))
 
     def predict(self):
-        return self.predict_fn(self.x_value)
+        return self.predict_fn(self.x_value)[0]
 
 
-def main(m=1, r=3):
+def main(m=2, r=3):
     gen = SimpleGenerator(num=m)
     bed = TestBed(m=m, r=r)
     vis = Visualizer()
 
-    # pretrain
     for i in xrange(10):
         bed.supply(gen.next())
-    bed.pretrain(10, pretraining_lr=0.1)
 
     for i,y in enumerate(gen):
+        # pretrain
+        if i % 10 == 0:
+           bed.pretrain(10, pretraining_lr=0.1)
+
+        # predict
         y_pred = bed.predict()
         print("{}: y={}, y_pred={}".format(i, y, y_pred))
         vis.append(y, y_pred)
+
+        # finetune
         bed.supply(y)
         bed.finetune(10, finetunning_lr=0.1)
-        time.sleep(1.0)
+        bed.finetune(10, finetunning_lr=0.01)
+        bed.finetune(10, finetunning_lr=0.001)
+        time.sleep(.02)
 
 if __name__ == '__main__':
     main()
