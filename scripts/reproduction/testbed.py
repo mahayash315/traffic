@@ -56,11 +56,11 @@ def test_theanets():
 
         return pred_y, mae, mre
 
-    def test_and_plot(exp, max_m=n_output, block=False):
+    def test_and_plot(exp, indexes=None, block=False):
         pred_y, mae, mre = test(exp)
         print("MAE = {}".format(mae))
         print("MRE = {}%".format(mre*100.0))
-        plot.plot(test_set_y, pred_y, max_m=max_m, block=block)
+        plot.plot(test_set_y, pred_y, indexes=indexes, block=block)
 
     # 実験用のネットワークを作る
     exp1 = theanets.Experiment(
@@ -79,7 +79,7 @@ def test_theanets():
     # train the model
     pretrain(exp1)
     train(exp1)
-    test_and_plot(exp1, max_m=2, block=True)
+    test_and_plot(exp1, indexes=range(0,1), block=True)
 
 
 def test_SdA(finetune_lr=0.1, training_epochs=1000,
@@ -99,7 +99,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     n_input = train_set_x.get_value(borrow=True).shape[1]
     n_output = train_set_y.get_value(borrow=True).shape[1]
 
-    plot.plot(train_set_y, block=False)
+    plot.plot(train_set_y, indexes=range(0,2), block=False)
 
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0]
@@ -239,7 +239,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     print("-*-*RESULT*-*-")
     print("mae={}".format(mae))
     print("mre={}".format(mre))
-    plot.plot(test_set_y, y_pred, block=True)
+    plot.plot(test_set_y, y_pred, indexes=range(0,2), block=True)
 
 def load_data(train_from_day=0, train_days=60,
               test_from_day=0, test_days=60,
