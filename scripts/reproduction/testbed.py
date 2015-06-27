@@ -9,6 +9,7 @@ import numpy
 from SdA import SdA
 
 import theanets
+import cPickle
 
 import pems
 import util
@@ -71,7 +72,8 @@ def test_theanets():
     test_and_plot(exp1, indexes=range(0,1), block=True)
 
 
-def test_SdA(finetune_lr=0.1, training_epochs=1000,
+def test_SdA(output_folder = None, state_filename="state.save",
+             finetune_lr=0.1, training_epochs=1000,
              pretrain_lr=0.01, pretraining_epochs=15,
              batch_size=1):
     # load dataset
@@ -93,6 +95,14 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     n_train_batches = train_set_x.get_value(borrow=True).shape[0]
     n_train_batches /= batch_size
 
+    # setup output directory
+    if output_folder is None:
+        d = datetime.datetime.today()
+        output_folder = "out/{}-{}-{}_{}:{}:{}".format(d.year, d.month, d.day, d.hour, d.minute, d.second)
+        if not os.path.isdir(output_folder):
+            os.makedirs(output_folder)
+    os.chdir(output_folder)
+
     # numpy random generator
     # start-snippet-3
     numpy_rng = numpy.random.RandomState(89677)
@@ -104,6 +114,11 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
         hidden_layers_sizes=[1000, 1000, 1000],
         n_outs=n_output
     )
+
+    def save_state():
+        f = file(state_filename, 'wb')
+        cPickle.dump(sda, f, protocol=cPickle.HIGHEST_PROTOCOL)
+        f.close()
 
     predict_fn = sda.build_predict_function()
 
@@ -133,6 +148,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
 
     print >> sys.stderr, ('The pretraining code for file ' + os.path.split(__file__)[1] + ' ran for %.2fm' % ((end_time - start_time) / 60.))
 
+    save_state()
 
     ########################
     # FINETUNING THE MODEL #
@@ -204,6 +220,8 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
             if patience <= iter:
                 done_looping = True
                 break
+
+        save_state()
 
     end_time = time.clock()
     print(

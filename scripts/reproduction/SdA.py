@@ -337,6 +337,18 @@ class SdA(object):
             name='predict'
         )
 
+    def __getstate__(self):
+        return [param.get_value(borrow=True) for param in self.params]
+
+    def __setstate__(self, state):
+        for k, param in enumerate(self.params):
+            value = param.get_value(borrow=True)
+            for i in xrange(value.shape[0]):
+                for j in xrange(value.shape[1]):
+                    value[i][j] = state[k][i][j]
+
+
+
 
 def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
              pretrain_lr=0.001, training_epochs=1000,
