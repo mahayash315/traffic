@@ -37,7 +37,7 @@ def load_data(filename, from_day=0, days=60, r=0, d=1):
     dataset_x = [[dataset[(j-(i%(r+1)))][int(i/(r+1))] for i in xrange(m*(r+1))] for j in xrange(r,n-d)]
     dataset_y = [[dataset[i][j] for j in xrange(m)] for i in xrange(r+d,n)]
 
-    return (numpy.asarray(dataset_x, dtype=theano.config.floatX), numpy.asarray(dataset_y, dtype=theano.config.floatX))
+    return (dataset_x, dataset_y)
 
 if __name__ == '__main__':
     dataset = load_data('../../data/PEMS-SF/PEMS_train',days=2,r=1)

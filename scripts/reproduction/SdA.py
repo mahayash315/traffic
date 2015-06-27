@@ -101,8 +101,8 @@ class SdA(object):
         if not theano_rng:
             theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
         # allocate symbolic variables for the data
-        self.x = T.dvector('x')  # the data is presented as real value vector
-        self.y = T.dvector('y')  # the labels are presented as real value vector
+        self.x = T.dmatrix('x')  # the data is presented as real value matrix
+        self.y = T.dmatrix('y')  # the labels are presented as real value matrix
         # end-snippet-1
 
         # The SdA is an MLP, for which all weights of intermediate layers

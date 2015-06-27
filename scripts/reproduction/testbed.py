@@ -10,6 +10,7 @@ from SdA import SdA
 import theanets
 
 import pems
+import util
 import plot
 
 def test_theanets():
@@ -87,12 +88,9 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     # load dataset
     datasets = load_data(train_days=2, test_days=2, r=2, d=1)
 
-    train_set_x = theano.shared(datasets[0][0], borrow=True)
-    train_set_y = theano.shared(datasets[0][1], borrow=True)
-    valid_set_x = theano.shared(datasets[1][0], borrow=True)
-    valid_set_y = theano.shared(datasets[1][1], borrow=True)
-    test_set_x = theano.shared(datasets[2][0], borrow=True)
-    test_set_y = theano.shared(datasets[2][1], borrow=True)
+    train_set_x, train_set_y = util.shared_dataset(datasets[0])
+    valid_set_x, valid_set_y = util.shared_dataset(datasets[1])
+    test_set_x, test_set_y = util.shared_dataset(datasets[2])
 
     train_set = (train_set_x, train_set_y)
     valid_set = (valid_set_x, valid_set_y)
@@ -229,14 +227,13 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
                           os.path.split(__file__)[1] +
                           ' ran for %.2fm' % ((end_time - start_time) / 60.))
 
-
 def load_data(train_from_day=0, train_days=60,
               test_from_day=0, test_days=60,
               r=2, d=1):
     datasets = pems.load_data("../../data/PEMS-SF/PEMS_train", from_day=train_from_day, days=train_days, r=r, d=d)
     datasets2 = pems.load_data("../../data/PEMS-SF/PEMS_test", from_day=test_from_day, days=test_days, r=r, d=d)
 
-    dataset_x, dataset_y = datasets
+    dataset_x, dataset_y = util.numpy_dataset(datasets)
 
     idx = range(0, dataset_x.shape[0])
     numpy.random.shuffle(idx)
