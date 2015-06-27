@@ -26,13 +26,12 @@ import sys
 import time
 
 import numpy
-
 import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
 from theano.tensor.nnet import conv
 
-from logistic_sgd import LogisticRegression, load_data
+from scripts.tutorial.logistic_sgd import LogisticRegression, load_data
 from mlp import HiddenLayer
 
 

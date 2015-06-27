@@ -2,10 +2,14 @@
 __author__ = 'masayuki'
 
 import sys
+
 import numpy
 import theanets
-import traffic
+
+from scripts.tutorial import traffic
 import plot
+
+
 
 # def load_data(self, filename, r, d):
 #     ''' Loads the dataset and setup experiment

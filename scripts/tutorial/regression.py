@@ -1,13 +1,11 @@
-import os
 import sys
-import time
 
 import numpy
 import theanets
 
-import traffic
+from scripts.tutorial import traffic
 import plot
-import helper
+
 
 def load_data(dataset, r=0, d=1):
     ''' Loads the dataset and setup experiment
@@ -47,7 +45,7 @@ def load_data(dataset, r=0, d=1):
 def test_regression():
     try:
         print('loading dataset...'),
-        datasets = load_data('/Users/masayuki/git/traffic/data/lane.180000.3.xml', r=2, d=1)
+        datasets = load_data('../../data/lane.180000.3.xml', r=2, d=1)
         print('done')
 
         train_set_x, train_set_y = datasets[0]

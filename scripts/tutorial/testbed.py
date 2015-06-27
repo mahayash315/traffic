@@ -2,10 +2,13 @@
 __author__ = 'masayuki'
 
 import sys
+
 import numpy
 import theanets
-import traffic
+
+from scripts.tutorial import traffic
 import plot
+
 
 class TestBed:
     def __init__(self, filename, r=0, d=1, debug_level=0):
@@ -153,7 +156,7 @@ class TestBed:
 def test_networks():
     # testbed をつくる
     # bed = TestBed("../data/lane.180000.3.xml", r=2, d=1)
-    bed = TestBed("../data/cross3ltl_full_3/lane.129600.1.xml", r=2, d=1, debug_level=0)
+    bed = TestBed("../../data/cross3ltl_full_3/lane.129600.1.xml", r=2, d=1, debug_level=0)
     n_input = bed.get_n_input()
     n_output = bed.get_n_outupt()
 

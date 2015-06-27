@@ -1,14 +1,9 @@
-import os
-import sys
-import time
+import xml.etree.ElementTree as ET
 
 import numpy
 
-import theano
-import theano.tensor as T
-import xml.etree.ElementTree as ET
+from scripts.tutorial import plot
 
-import plot
 
 def load_data(dataset, r=0, d=1, debug_level=0):
     ''' Loads the dataset
@@ -65,11 +60,11 @@ def load_data(dataset, r=0, d=1, debug_level=0):
 
 if __name__ == '__main__':
     try:
-        dataset1_x, dataset1_y = load_data('../data/cross3ltl_full_3/lane.129600.1.xml',r=0,d=1)
+        dataset1_x, dataset1_y = load_data('../../data/cross3ltl_full_3/lane.129600.1.xml',r=0,d=1)
         plot.plot(dataset1_y, block=False)
-        dataset2_x, dataset2_y = load_data('../data/cross3ltl_full_3/lane.129600.2.xml',r=0,d=1)
+        dataset2_x, dataset2_y = load_data('../../data/cross3ltl_full_3/lane.129600.2.xml',r=0,d=1)
         plot.plot(dataset2_y, block=False)
-        dataset3_x, dataset3_y = load_data('../data/cross3ltl_full_3/lane.129600.3.xml',r=0,d=1)
+        dataset3_x, dataset3_y = load_data('../../data/cross3ltl_full_3/lane.129600.3.xml',r=0,d=1)
         plot.plot(dataset3_y)
     except Exception as e:
         print('error')
