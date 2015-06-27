@@ -234,7 +234,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     ###########
     # PREDICT #
     ###########
-    y_pred = predict_fn(test_set_x)
+    y_pred = predict_fn(test_set_x.get_value(borrow=True))
     mae, mre = util.calculate_error_indexes(test_set_y, y_pred)
     print("-*-*RESULT*-*-")
     print("mae={}".format(mae))

@@ -326,7 +326,7 @@ class SdA(object):
         return train_fn, valid_score, test_score
 
     def build_predict_function(self):
-        x = T.dmatrix('x') # input vector
+        x = T.dmatrix('x') # input matrix
         return theano.function(
             [x],
             self.y_pred,
