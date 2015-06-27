@@ -17,11 +17,11 @@ def figure(Y, Y_pred=None, title='', indexes=None, fig=None):
     :return:
     '''
     Y = util.get_ndarray(Y)
-    Y_pred = None if Y_pred is None else util.get_ndarray(Y_pred)
+    Y_pred = None if not Y_pred else util.get_ndarray(Y_pred)
 
     # count the data
     n = Y.shape[0]
-    indexes = range(0,Y.shape[1]) if indexes is None else indexes
+    indexes = range(0,Y.shape[1]) if not indexes else indexes
 
     # validate indexes
     for i in indexes:
@@ -29,7 +29,7 @@ def figure(Y, Y_pred=None, title='', indexes=None, fig=None):
             indexes.remove(i)
 
     # create a Figure instance if necessary
-    fig = plt.figure() if fig is None else fig
+    fig = plt.figure() if not fig else fig
     fig.clear()
 
     # create axes
@@ -39,7 +39,7 @@ def figure(Y, Y_pred=None, title='', indexes=None, fig=None):
 
     # plot the data
     Yt = Y.transpose()
-    if Y_pred == None:
+    if not Y_pred:
         for i,index in enumerate(indexes):
             ax[i].plot(np.array(xrange(n)), Yt[index], "b.-")
     else:

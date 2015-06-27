@@ -10,7 +10,7 @@ def load_pems(filename, from_day=0, days=60):
     with open(filename, 'U') as fh:
         day = 0
         line = fh.readline()
-        while line != "":
+        while line:
             if (from_day <= day and day < to_day):
                 rows = line.strip()[1:-1].split(';')
                 if (dataset == None):

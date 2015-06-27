@@ -161,6 +161,7 @@ class SdA(object):
         # end-snippet-2
         # We now need to add a logistic layer on top of the MLP
         self.linLayer = LinearRegression(
+            rng=theano_rng,
             input=self.sigmoid_layers[-1].output,
             n_in=hidden_layers_sizes[-1],
             n_out=n_outs
