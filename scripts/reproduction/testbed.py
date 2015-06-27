@@ -99,6 +99,8 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     n_input = train_set_x.get_value(borrow=True).shape[1]
     n_output = train_set_y.get_value(borrow=True).shape[1]
 
+    plot.plot(train_set_y, block=False)
+
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0]
     n_train_batches /= batch_size
@@ -115,7 +117,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
         n_outs=n_output
     )
 
-    '''
+
     #########################
     # PRETRAINING THE MODEL #
     #########################
@@ -141,7 +143,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     end_time = time.clock()
 
     print >> sys.stderr, ('The pretraining code for file ' + os.path.split(__file__)[1] + ' ran for %.2fm' % ((end_time - start_time) / 60.))
-    '''
+
 
     ########################
     # FINETUNING THE MODEL #
@@ -154,6 +156,8 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
         batch_size=batch_size,
         learning_rate=finetune_lr
     )
+
+    predict_fn = sda.build_predict_function()
 
     print '... finetunning the model'
     # early-stopping parameters
@@ -226,6 +230,16 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     print >> sys.stderr, ('The training code for file ' +
                           os.path.split(__file__)[1] +
                           ' ran for %.2fm' % ((end_time - start_time) / 60.))
+
+    ###########
+    # PREDICT #
+    ###########
+    y_pred = predict_fn(test_set_x)
+    mae, mre = util.calculate_error_indexes(test_set_y, y_pred)
+    print("-*-*RESULT*-*-")
+    print("mae={}".format(mae))
+    print("mre={}".format(mre))
+    plot.plot(test_set_y, y_pred, block=True)
 
 def load_data(train_from_day=0, train_days=60,
               test_from_day=0, test_days=60,

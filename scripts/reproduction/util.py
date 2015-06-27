@@ -38,3 +38,33 @@ def shared_dataset(data_xy, borrow=True):
         else theano.shared(numpy.asarray(data_y, dtype=theano.config.floatX), borrow=borrow)
     )
     return (shared_x, shared_y)
+
+def calculate_error_indexes(y, y_pred):
+    '''
+    MAE と MRE を返す
+    :param y:
+    :param y_pred:
+    :return:
+    '''
+    # retrieve numpy ndarray
+    y = get_ndarray(y)
+    y_pred = get_ndarray(y_pred)
+
+    # calculate Mean Absolute Percentage Error (MAPE)
+    E = y - y_pred
+    absE = numpy.absolute(E)
+    mx = numpy.sum(y) / (y.shape[0] * y.shape[1]) # mean of X
+    mae = numpy.sum(absE) / (absE.shape[0] * absE.shape[1])
+    mre = mae / mx
+
+    return (mae, mre)
+
+def get_ndarray(x, borrow=True):
+    if isinstance(x, numpy.ndarray):
+        return x
+    elif isinstance(x, theano.tensor.sharedvar.TensorSharedVariable):
+        return x.get_value(borrow=borrow)
+    elif isinstance(x, list):
+        return numpy.asarray(list, dtype=theano.config.floatX)
+    else:
+        raise NotImplementedError

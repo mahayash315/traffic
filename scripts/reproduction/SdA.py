@@ -176,6 +176,9 @@ class SdA(object):
         # symbolic variable that points to the number of errors made on the
         # minibatch given by self.x and self.y
         self.errors = self.linLayer.errors(self.y)
+        #
+        #
+        self.y_pred = self.linLayer.y_pred
 
     def pretraining_functions(self, train_set_x, batch_size):
         ''' Generates a list of functions, each of them implementing one
@@ -322,6 +325,17 @@ class SdA(object):
 
         return train_fn, valid_score, test_score
 
+    def build_predict_function(self):
+        x = T.dmatrix('x') # input vector
+        return theano.function(
+            [x],
+            self.y_pred,
+            givens={
+                self.x: x
+            },
+            name='predict'
+        )
+
 
 def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
              pretrain_lr=0.001, training_epochs=1000,
@@ -375,8 +389,7 @@ def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
     # PRETRAINING THE MODEL #
     #########################
     print '... getting the pretraining functions'
-    pretraining_fns = sda.pretraining_functions(train_set_x=train_set_x,
-                                                batch_size=batch_size)
+    pretraining_fns = sda.pretraining_functions(train_set_x=train_set_x, batch_size=batch_size)
 
     print '... pre-training the model'
     start_time = time.clock()
