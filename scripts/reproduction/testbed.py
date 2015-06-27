@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import datetime
 
 import theano
 import numpy
@@ -40,20 +41,7 @@ def test_theanets():
 
     def test(exp):
         pred_y = exp.network.predict(test_set_x)
-
-        # calculate Mean Absolute Percentage Error (MAPE)
-        E = test_set_y - pred_y
-        absE = numpy.absolute(E)
-        mx = numpy.sum(test_set_x) / (test_set_x.shape[0] * test_set_x.shape[1]) # mean of X
-        mae = numpy.sum(absE) / (absE.shape[0] * absE.shape[1])
-        mre = mae / mx
-
-        # print("Y = \n{}".format(test_set_y))
-        # print("Y(pred) = \n{}".format(pred_y))
-        # print("E = \n{}".format(E))
-        print("MAE = {}".format(mae))
-        print("MRE = {}%".format(mre*100.0))
-
+        mae, mre = util.calculate_error_indexes(test_set_x, pred_y)
         return pred_y, mae, mre
 
     def test_and_plot(exp, indexes=None, block=False):
@@ -99,8 +87,6 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     n_input = train_set_x.get_value(borrow=True).shape[1]
     n_output = train_set_y.get_value(borrow=True).shape[1]
 
-    plot.plot(train_set_y, indexes=range(0,2), block=False)
-
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0]
     n_train_batches /= batch_size
@@ -117,6 +103,7 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
         n_outs=n_output
     )
 
+    predict_fn = sda.build_predict_function()
 
     #########################
     # PRETRAINING THE MODEL #
@@ -156,8 +143,6 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
         batch_size=batch_size,
         learning_rate=finetune_lr
     )
-
-    predict_fn = sda.build_predict_function()
 
     print '... finetunning the model'
     # early-stopping parameters
@@ -239,7 +224,16 @@ def test_SdA(finetune_lr=0.1, training_epochs=1000,
     print("-*-*RESULT*-*-")
     print("mae={}".format(mae))
     print("mre={}".format(mre))
-    plot.plot(test_set_y, y_pred, indexes=range(0,2), block=True)
+
+    # plot
+    d = datetime.datetime.today()
+    output_folder = "out/{}-{}-{}_{}:{}:{}".format(d.year, d.month, d.day, d.hour, d.minute, d.second)
+    if not os.path.isdir(output_folder):
+        os.makedirs(output_folder)
+    os.chdir(output_folder)
+    for i in xrange(n_output):
+        filename = "{}.png".format(str(i))
+        plot.savefig(filename, test_set_x, y_pred, indexes=[i])
 
 def load_data(train_from_day=0, train_days=60,
               test_from_day=0, test_days=60,

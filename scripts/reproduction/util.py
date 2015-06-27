@@ -50,12 +50,9 @@ def calculate_error_indexes(y, y_pred):
     y = get_ndarray(y)
     y_pred = get_ndarray(y_pred)
 
-    # calculate Mean Absolute Percentage Error (MAPE)
-    E = y - y_pred
-    absE = numpy.absolute(E)
-    mx = numpy.sum(y) / (y.shape[0] * y.shape[1]) # mean of X
-    mae = numpy.sum(absE) / (absE.shape[0] * absE.shape[1])
-    mre = mae / mx
+    # calculate Mean Absolute Error
+    mae = numpy.sum(numpy.abs(y - y_pred)) / y.shape[0]
+    mre = numpy.sum(numpy.abs(y - y_pred) / y) / y.shape[0]
 
     return (mae, mre)
 
