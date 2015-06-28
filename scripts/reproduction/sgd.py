@@ -10,48 +10,19 @@ import theano.tensor as T
 import pems
 
 class LinearRegression(object):
-    """
-    Real-value Regression Class
-    """
-
     def __init__(self, rng, input, n_in, n_out, W=None, b=None,
                  activation=T.tanh):
-        """ Initialize the parameters of the logistic regression
-
-        :type input: theano.tensor.TensorType
-        :param input: symbolic variable that describes the input of the
-                      architecture (one minibatch)
-
-        :type n_in: int
-        :param n_in: number of input units, the dimension of the space in
-                     which the datapoints lie
-
-        :type n_out: int
-        :param n_out: number of output units, the dimension of the space in
-                      which the labels lie
-
-        :type activation: theano.Op or function
-        :param activation: theano.tensor activation function
-
-        """
-        # start-snippet-1
         if W is None:
-            W_values = numpy.zeros(
-                (n_in, n_out),
+            W_values = numpy.asarray(
+                rng.uniform(
+                    low=-numpy.sqrt(6. / (n_in + n_out)),
+                    high=numpy.sqrt(6. / (n_in + n_out)),
+                    size=(n_in, n_out)
+                ),
                 dtype=theano.config.floatX
             )
-
-            # FIXME: better to initialize with the following weight
-            # W_values = numpy.asarray(
-            #     rng.uniform(
-            #         low=-numpy.sqrt(6. / (n_in + n_out)),
-            #         high=numpy.sqrt(6. / (n_in + n_out)),
-            #         size=(n_in, n_out)
-            #     ),
-            #     dtype=theano.config.floatX
-            # )
-            # if activation == theano.tensor.nnet.sigmoid:
-            #     W_values *= 4
+            if activation == theano.tensor.nnet.sigmoid:
+                W_values *= 4
 
             W = theano.shared(value=W_values, name='W', borrow=True)
 
@@ -67,22 +38,10 @@ class LinearRegression(object):
             lin_output if activation is None
             else activation(lin_output)
         )
-        # end-snippet-1
-
         # parameters of the model
         self.params = [self.W, self.b]
 
     def errors(self, y):
-        """Return a float representing the number of errors in the minibatch
-        over the total number of examples of the minibatch ; zero one
-        loss over the size of the minibatch
-
-        :type y: theano.tensor.TensorType
-        :param y: corresponds to a vector that gives for each example the
-                  correct label
-        """
-
-        # check if y has same dimension of y_pred
         if y.ndim != self.y_pred.ndim:
             raise TypeError(
                 'y should have the same shape as self.y_pred',
@@ -90,7 +49,6 @@ class LinearRegression(object):
             )
         # check if y is of the correct datatype
         if y.dtype.startswith('float'):
-            # return mean squared error
             return T.mean(T.sqr(y-self.y_pred))
         else:
             raise NotImplementedError()

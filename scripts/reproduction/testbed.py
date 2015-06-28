@@ -351,5 +351,5 @@ def load_data(r=2, d=1):
 
 if __name__ == '__main__':
     # test_theanets()
-    # test_SdA()
-    test("out/2015-6-28_14:40:25")
+    test_SdA()
+    # test("out/2015-6-28_14:40:25")
