@@ -16,6 +16,7 @@ class TestBed:
         self.n_input = m*(r+1)
         self.n_output = m
         self.data = [[0 for j in xrange(m)] for i in xrange(window_size + (r+1))]
+        self.x_value_pred = numpy.zeros((window_size, self.n_input), dtype=theano.config.floatX)
         self.x_value = numpy.zeros((window_size, self.n_input), dtype=theano.config.floatX)
         self.x = theano.shared(self.x_value, borrow=True)
         self.y_value = numpy.zeros((window_size, self.n_output), dtype=theano.config.floatX)
@@ -50,9 +51,11 @@ class TestBed:
             self.data.pop(0)
 
         for i in xrange(self.x_value.shape[0]-1):
+            self.x_value_pred[i] = self.x_value_pred[i+1]
             self.x_value[i] = self.x_value[i+1]
             self.y_value[i] = self.y_value[i+1]
-        self.x_value[-1] = [self.data[-1-i%(self.r+1)][int(i/(self.r+1))] for i in xrange(self.x_value.shape[1])]
+        self.x_value_pred[-1] = [self.data[-1-i%(self.r+1)][int(i/(self.r+1))] for i in xrange(self.x_value.shape[1])]
+        self.x_value[-1] = self.x_value_pred[-2]
         self.y_value[-1] = y
 
     def pretrain(self, pretraining_epochs, pretraining_lr):
@@ -77,22 +80,21 @@ class TestBed:
                 print(" epoch {}: cost={}".format(epoch, minibatch_avg_cost))
 
     def predict(self):
-        return self.predict_fn(self.x_value)[0]
+        return self.predict_fn(self.x_value_pred)[0]
 
 
-def main(m=2, r=3):
+def main(m=1, r=2):
     gen = SimpleGenerator(num=m)
-    bed = TestBed(m=m, r=r)
+    bed = TestBed(m=m, r=r, window_size=20)
     vis = Visualizer()
 
     for i in xrange(10):
         bed.supply(gen.next())
 
-    for i,y in enumerate(gen):
-        # pretrain
-        if i % 10 == 0:
-           bed.pretrain(10, pretraining_lr=0.1)
+    # pretrain
+    bed.pretrain(10, pretraining_lr=0.1)
 
+    for i,y in enumerate(gen):
         # predict
         y_pred = bed.predict()
         print("{}: y={}, y_pred={}".format(i, y, y_pred))
@@ -101,9 +103,9 @@ def main(m=2, r=3):
         # finetune
         bed.supply(y)
         bed.finetune(10, finetunning_lr=0.1)
-        bed.finetune(10, finetunning_lr=0.01)
-        bed.finetune(10, finetunning_lr=0.001)
-        time.sleep(.02)
+        # bed.finetune(10, finetunning_lr=0.01)
+        # bed.finetune(10, finetunning_lr=0.001)
+        time.sleep(.1)
 
 if __name__ == '__main__':
     main()

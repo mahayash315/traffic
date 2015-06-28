@@ -246,11 +246,6 @@ def test_SdA(output_folder = None, state_filename="state.save",
     print("mre={}".format(mre))
 
     # plot
-    d = datetime.datetime.today()
-    output_folder = "out/{}-{}-{}_{}:{}:{}".format(d.year, d.month, d.day, d.hour, d.minute, d.second)
-    if not os.path.isdir(output_folder):
-        os.makedirs(output_folder)
-    os.chdir(output_folder)
     for i in xrange(n_output):
         filename = "{}.png".format(str(i))
         plot.savefig(filename, test_set_x, y_pred, indexes=[i])
@@ -276,6 +271,12 @@ def test_SdA(output_folder = None, state_filename="state.save",
 #     test_set_x, test_set_y = datasets2
 #
 #     return ((train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y))
+
+def test(input_folder, state_filename="state.save"):
+    if not os.path.isdir(input_folder):
+        raise "input folder {}".format(input_folder)
+    os.chdir(input)
+    f = file()
 
 def load_data(r=2, d=1):
     datasets = pems.load_data("../../data/PEMS-SF/PEMS_sorted", from_day=0, days=90, r=r, d=d)
