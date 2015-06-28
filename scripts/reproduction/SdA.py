@@ -90,7 +90,10 @@ class SdA(object):
         :param corruption_levels: amount of corruption to use for each
                                   layer
         """
-
+        self.numpy_rng = numpy_rng
+        self.n_input = n_ins
+        self.n_output = n_outs
+        self.corruption_levels = corruption_levels
         self.sigmoid_layers = []
         self.dA_layers = []
         self.params = []
@@ -338,9 +341,23 @@ class SdA(object):
         )
 
     def __getstate__(self):
-        return [param.get_value(borrow=True) for param in self.params]
+        return {
+            "numpy_rng": self.numpy_rng,
+            "n_ins": self.n_input,
+            "n_outs": self.n_output,
+            "corruption_levels": self.corruption_levels,
+            "params": [param.get_value(borrow=True) for param in self.params]
+        }
 
     def __setstate__(self, state):
+        self.__init__(
+            numpy_rng=state["numpy_rng"],
+            theano_rng=None,
+            n_ins=state["n_ins"],
+            n_outs=state["n_outs"],
+            corruption_levels=state["corruption_levels"]
+        )
+
         for k, param in enumerate(self.params):
             value = param.get_value(borrow=True)
             for i in xrange(value.shape[0]):
