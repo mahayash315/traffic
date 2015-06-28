@@ -23,6 +23,10 @@ def figure(Y, Y_pred=None, title='', indexes=None, fig=None):
     n = Y.shape[0]
     indexes = range(0,Y.shape[1]) if indexes is None else indexes
 
+    # calculate width
+    widthscale = max(1, n / 8)
+    figsize = [min(30, 8 * widthscale), 6]
+
     # validate indexes
     for i in indexes:
         if i < 0 or Y.shape[1] <= i:
@@ -31,6 +35,7 @@ def figure(Y, Y_pred=None, title='', indexes=None, fig=None):
     # create a Figure instance if necessary
     fig = plt.figure() if fig is None else fig
     fig.clear()
+    fig.set_size_inches(figsize)
 
     # create axes
     ax = []

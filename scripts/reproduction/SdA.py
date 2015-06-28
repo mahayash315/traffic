@@ -62,7 +62,7 @@ class SdA(object):
         numpy_rng,
         theano_rng=None,
         n_ins=784,
-        hidden_layers_sizes=[500, 500],
+        hidden_layers_sizes=[1000, 1000, 1000],
         n_outs=10,
         corruption_levels=[0.1, 0.1]
     ):
@@ -92,6 +92,7 @@ class SdA(object):
         """
         self.numpy_rng = numpy_rng
         self.n_input = n_ins
+        self.hidden_layers_sizes = hidden_layers_sizes
         self.n_output = n_outs
         self.corruption_levels = corruption_levels
         self.sigmoid_layers = []
@@ -344,16 +345,21 @@ class SdA(object):
         return {
             "numpy_rng": self.numpy_rng,
             "n_ins": self.n_input,
+            "hidden_layer_sizes": self.hidden_layers_sizes,
             "n_outs": self.n_output,
             "corruption_levels": self.corruption_levels,
             "params": [param.get_value(borrow=True) for param in self.params]
         }
 
     def __setstate__(self, state):
+        if not "hidden_layer_sizes" in state:
+            state["hidden_layer_sizes"] = [1000, 1000, 1000]
+
         self.__init__(
             numpy_rng=state["numpy_rng"],
             theano_rng=None,
             n_ins=state["n_ins"],
+            hidden_layers_sizes=state["hidden_layer_sizes"],
             n_outs=state["n_outs"],
             corruption_levels=state["corruption_levels"]
         )
@@ -361,8 +367,7 @@ class SdA(object):
         for k, param in enumerate(self.params):
             value = param.get_value(borrow=True)
             for i in xrange(value.shape[0]):
-                for j in xrange(value.shape[1]):
-                    value[i][j] = state[k][i][j]
+                value[i] = state["params"][k][i]
 
 
 

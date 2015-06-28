@@ -251,6 +251,57 @@ def test_SdA(output_folder = None, state_filename="state.save",
         filename = "{}.png".format(str(i))
         plot.savefig(filename, test_set_x[:cut], y_pred[:cut], indexes=[i])
 
+def test(input_folder, state_filename="state.save",
+         output_folder=None,
+         r=2, d=1):
+    wd = os.getcwd()
+
+    print('loading dataset...'),
+    # load dataset
+    datasets = load_data(r=r, d=d)
+
+    test_set = datasets[2]
+    test_set_x, test_set_y = test_set
+
+    n_test = test_set_x.shape[0]
+    n_input = test_set_x.shape[1]
+    n_output = test_set_y.shape[1]
+    print('done')
+
+    print('loading sda'),
+    if not os.path.isdir(input_folder):
+        raise "input folder {}".format(input_folder)
+    os.chdir(input_folder)
+    f = file(state_filename, 'rb')
+    sda = cPickle.load(f)
+    f.close()
+    os.chdir(wd)
+
+    predict_fn = sda.build_predict_function()
+    print('done')
+
+    if output_folder is None:
+        d = datetime.datetime.today()
+        output_folder = "out/{}-{}-{}_{}:{}:{}".format(d.year, d.month, d.day, d.hour, d.minute, d.second)
+        if not os.path.isdir(output_folder):
+            os.makedirs(output_folder)
+    os.chdir(output_folder)
+
+    ###########
+    # PREDICT #
+    ###########
+    y_pred = predict_fn(test_set_x)
+    mae, mre = util.calculate_error_indexes(test_set_y, y_pred)
+    print("-*-*RESULT*-*-")
+    print("mae={}".format(mae))
+    print("mre={}".format(mre))
+
+    # plot
+    cut = min(10*144, n_test)
+    for i in xrange(n_output):
+        filename = "{}.png".format(str(i))
+        plot.savefig(filename, test_set_x[:cut], y_pred[:cut], indexes=[i])
+
 # def load_data(train_from_day=0, train_days=60,
 #               test_from_day=0, test_days=60,
 #               r=2, d=1):
@@ -272,54 +323,6 @@ def test_SdA(output_folder = None, state_filename="state.save",
 #     test_set_x, test_set_y = datasets2
 #
 #     return ((train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y))
-
-def test(input_folder, state_filename="state.save",
-         output_folder=None,
-         r=2, d=1):
-    print('loading dataset...'),
-    # load dataset
-    datasets = load_data(r=r, d=d)
-
-    test_set = datasets[2]
-    test_set_x, test_set_y = test_set
-
-    n_test = test_set_x.shape[0]
-    n_input = test_set_x.shape[1]
-    n_output = test_set_y.shape[1]
-    print('done')
-
-    print('loading sda'),
-    if not os.path.isdir(input_folder):
-        raise "input folder {}".format(input_folder)
-    os.chdir(input_folder)
-    f = file(state_filename, 'rb')
-    sda = cPickle.load(f)
-    f.close()
-
-    predict_fn = sda.build_predict_function()
-    print('done')
-
-    if output_folder is None:
-        d = datetime.datetime.today()
-        output_folder = "out/{}-{}-{}_{}:{}:{}".format(d.year, d.month, d.day, d.hour, d.minute, d.second)
-        if not os.path.isdir(output_folder):
-            os.makedirs(output_folder)
-    os.chdir(output_folder)
-
-    ###########
-    # PREDICT #
-    ###########
-    y_pred = predict_fn(test_set_x.get_value(borrow=True))
-    mae, mre = util.calculate_error_indexes(test_set_y, y_pred)
-    print("-*-*RESULT*-*-")
-    print("mae={}".format(mae))
-    print("mre={}".format(mre))
-
-    # plot
-    cut = min(10*144, n_test)
-    for i in xrange(n_output):
-        filename = "{}.png".format(str(i))
-        plot.savefig(filename, test_set_x[:cut], y_pred[:cut], indexes=[i])
 
 def load_data(r=2, d=1):
     datasets = pems.load_data("../../data/PEMS-SF/PEMS_sorted", from_day=0, days=90, r=r, d=d)
@@ -345,7 +348,8 @@ def load_data(r=2, d=1):
 
     return ((train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y))
 
+
 if __name__ == '__main__':
     # test_theanets()
-    test_SdA()
-    # test("out/2015-6-28_3:24:8")
+    # test_SdA()
+    test("out/2015-6-28_14:40:25")
