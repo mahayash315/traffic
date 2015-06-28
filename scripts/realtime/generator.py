@@ -26,9 +26,9 @@ class SimpleGenerator(Generator):
 
     def itrgenerate(self, x, l):
         if l % 2 == 0:
-            y = math.sin(x / math.pi)
+            y = (1 + math.sin(x / math.pi)) * 0.5
         else:
-            y = math.cos(x / math.pi)
+            y = (1 + math.cos(x / math.pi)) * 0.5
         y += self.noise(x)
         return y
 
