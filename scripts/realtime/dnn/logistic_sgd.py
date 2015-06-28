@@ -85,7 +85,7 @@ class LinearRegression(object):
             )
         # check if y is of the correct datatype
         if y.dtype.startswith('float'):
-            return T.sum(T.sqr(y-self.y_pred))
+            return T.mean(T.sqr(y-self.y_pred))
         else:
             raise NotImplementedError()
 
