@@ -246,10 +246,10 @@ def test_SdA(output_folder = None, state_filename="state.save",
     print("mre={}".format(mre))
 
     # plot
-    cut = min(10*144, test_set_x.shape[0])
+    cut = min(10*144, test_set_x.get_value(borrow=True).shape[0])
     for i in xrange(n_output):
         filename = "{}.png".format(str(i))
-        plot.savefig(filename, test_set_x[:cut], y_pred[:cut], indexes=[i])
+        plot.savefig(filename, test_set_x.get_value(borrow=True)[:cut], y_pred[:cut], indexes=[i])
 
 def test(input_folder, state_filename="state.save",
          output_folder=None,
