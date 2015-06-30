@@ -10,6 +10,9 @@ from SdA import SdA
 
 import cPickle
 
+import matplotlib
+matplotlib.use('Agg')
+
 import pems
 import util
 import plot
