@@ -8,7 +8,6 @@ import theano
 import numpy
 from SdA import SdA
 
-import theanets
 import cPickle
 
 import pems
