@@ -43,7 +43,7 @@ class TestBed:
             train_set_y=self.y,
             batch_size=batch_size,
         )
-        self.predict_fn = self.sda.build_prediction_function()
+        self.predict_fn = self.sda.build_predict_function()
 
     def supply(self, y):
         self.data.append(y)

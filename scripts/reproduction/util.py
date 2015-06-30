@@ -30,12 +30,18 @@ def shared_dataset(data_xy, borrow=True):
     '''
     data_x, data_y = data_xy
     shared_x = (
-        theano.shared(data_x, borrow=borrow) if isinstance(data_x, numpy.ndarray)
-        else theano.shared(numpy.asarray(data_x, dtype=theano.config.floatX), borrow=borrow)
+        data_x if isinstance(data_x, theano.tensor.sharedvar.TensorSharedVariable)
+        else (
+            theano.shared(data_x, borrow=borrow) if isinstance(data_x, numpy.ndarray)
+            else theano.shared(numpy.asarray(data_x, dtype=theano.config.floatX), borrow=borrow)
+        )
     )
     shared_y = (
-        theano.shared(data_y, borrow=borrow) if isinstance(data_y, numpy.ndarray)
-        else theano.shared(numpy.asarray(data_y, dtype=theano.config.floatX), borrow=borrow)
+        data_y if isinstance(data_y, theano.tensor.sharedvar.TensorSharedVariable)
+        else (
+            theano.shared(data_y, borrow=borrow) if isinstance(data_y, numpy.ndarray)
+            else theano.shared(numpy.asarray(data_y, dtype=theano.config.floatX), borrow=borrow)
+        )
     )
     return (shared_x, shared_y)
 

@@ -89,6 +89,14 @@ class SdA(object):
         :param corruption_levels: amount of corruption to use for each
                                   layer
         """
+        self.args = {
+            'numpy_rng': numpy_rng,
+            'theano_rng': theano_rng,
+            'n_ins': n_ins,
+            'hidden_layers_sizes': hidden_layers_sizes,
+            'n_outs': n_outs,
+            'corruption_levels': corruption_levels
+        }
 
         self.sigmoid_layers = []
         self.dA_layers = []
@@ -100,8 +108,8 @@ class SdA(object):
         if not theano_rng:
             theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
         # allocate symbolic variables for the data
-        self.x = T.matrix('x')  # the data is presented as rasterized images
-        self.y = T.matrix('y')  # the labels are presented as 1D vector of
+        self.x = T.dmatrix('x')  # the data is presented as rasterized images
+        self.y = T.dmatrix('y')  # the labels are presented as 1D vector of
                                  # [int] labels
         # end-snippet-1
 
@@ -287,7 +295,7 @@ class SdA(object):
 
         return train_fn
 
-    def build_prediction_function(self):
+    def build_predict_function(self):
         x = T.dmatrix('x')
         return theano.function(
             [x],
@@ -296,6 +304,21 @@ class SdA(object):
                 self.x: x
             }
         )
+
+    def __getstate__(self):
+        return {
+            'args': self.args,
+            'params': [param.get_value(borrow=True) for param in self.params]
+        }
+
+    def __setstate__(self, state):
+        args = state['args']
+        self.__init__(**args)
+
+        for k, param in enumerate(self.params):
+            value = param.get_value(borrow=True)
+            for i in xrange(value.shape[0]):
+                value[i] = state["params"][k][i]
 
 
 def test_SdA(finetune_lr=0.1, pretraining_epochs=15,

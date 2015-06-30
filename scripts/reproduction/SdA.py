@@ -58,13 +58,13 @@ class SdA(object):
     """
 
     def __init__(
-        self,
-        numpy_rng,
-        theano_rng=None,
-        n_ins=784,
-        hidden_layers_sizes=[1000, 1000, 1000],
-        n_outs=10,
-        corruption_levels=[0.1, 0.1]
+            self,
+            numpy_rng,
+            theano_rng=None,
+            n_ins=784,
+            hidden_layers_sizes=[500, 500],
+            n_outs=10,
+            corruption_levels=[0.1, 0.1]
     ):
         """ This class is made to support a variable number of layers.
 
@@ -90,11 +90,15 @@ class SdA(object):
         :param corruption_levels: amount of corruption to use for each
                                   layer
         """
-        self.numpy_rng = numpy_rng
-        self.n_input = n_ins
-        self.hidden_layers_sizes = hidden_layers_sizes
-        self.n_output = n_outs
-        self.corruption_levels = corruption_levels
+        self.args = {
+            'numpy_rng': numpy_rng,
+            'theano_rng': theano_rng,
+            'n_ins': n_ins,
+            'hidden_layers_sizes': hidden_layers_sizes,
+            'n_outs': n_outs,
+            'corruption_levels': corruption_levels
+        }
+
         self.sigmoid_layers = []
         self.dA_layers = []
         self.params = []
@@ -105,8 +109,9 @@ class SdA(object):
         if not theano_rng:
             theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
         # allocate symbolic variables for the data
-        self.x = T.dmatrix('x')  # the data is presented as real value matrix
-        self.y = T.dmatrix('y')  # the labels are presented as real value matrix
+        self.x = T.dmatrix('x')  # the data is presented as rasterized images
+        self.y = T.dmatrix('y')  # the labels are presented as 1D vector of
+        # [int] labels
         # end-snippet-1
 
         # The SdA is an MLP, for which all weights of intermediate layers
@@ -183,6 +188,7 @@ class SdA(object):
         self.errors = self.linLayer.errors(self.y)
         #
         #
+        #
         self.y_pred = self.linLayer.y_pred
 
     def pretraining_functions(self, train_set_x, batch_size):
@@ -216,8 +222,7 @@ class SdA(object):
         pretrain_fns = []
         for dA in self.dA_layers:
             # get the cost and the updates list
-            cost, updates = dA.get_cost_updates(corruption_level,
-                                                learning_rate)
+            cost, updates = dA.get_cost_updates(corruption_level, learning_rate)
             # compile the theano function
             fn = theano.function(
                 inputs=[
@@ -236,7 +241,7 @@ class SdA(object):
 
         return pretrain_fns
 
-    def build_finetune_functions(self, datasets, batch_size, learning_rate):
+    def build_finetune_functions(self, datasets, batch_size):
         '''Generates a function `train` that implements one step of
         finetuning, a function `validate` that computes the error on
         a batch from the validation set, and a function `test` that
@@ -267,6 +272,7 @@ class SdA(object):
         n_test_batches /= batch_size
 
         index = T.lscalar('index')  # index to a [mini]batch
+        learning_rate = T.scalar('lr')  # learning rate to use
 
         # compute the gradients with respect to the model parameters
         gparams = T.grad(self.finetune_cost, self.params)
@@ -278,7 +284,10 @@ class SdA(object):
         ]
 
         train_fn = theano.function(
-            inputs=[index],
+            inputs=[
+                index,
+                theano.Param(learning_rate, default=0.1)
+            ],
             outputs=self.finetune_cost,
             updates=updates,
             givens={
@@ -343,26 +352,13 @@ class SdA(object):
 
     def __getstate__(self):
         return {
-            "numpy_rng": self.numpy_rng,
-            "n_ins": self.n_input,
-            "hidden_layer_sizes": self.hidden_layers_sizes,
-            "n_outs": self.n_output,
-            "corruption_levels": self.corruption_levels,
-            "params": [param.get_value(borrow=True) for param in self.params]
+            'args': self.args,
+            'params': [param.get_value(borrow=True) for param in self.params]
         }
 
     def __setstate__(self, state):
-        if not "hidden_layer_sizes" in state:
-            state["hidden_layer_sizes"] = [1000, 1000, 1000]
-
-        self.__init__(
-            numpy_rng=state["numpy_rng"],
-            theano_rng=None,
-            n_ins=state["n_ins"],
-            hidden_layers_sizes=state["hidden_layer_sizes"],
-            n_outs=state["n_outs"],
-            corruption_levels=state["corruption_levels"]
-        )
+        args = state['args']
+        self.__init__(**args)
 
         for k, param in enumerate(self.params):
             value = param.get_value(borrow=True)
