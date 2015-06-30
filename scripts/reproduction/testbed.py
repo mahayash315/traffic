@@ -204,9 +204,11 @@ def test_SdA(state_file=None, output_folder=None):
     ########################
     # FINETUNING THE MODEL #
     ########################
-    bed.finetune(train_set, valid_set, test_set, epochs=1, learning_rate=0.1, batch_size=1)
-    bed.finetune(train_set, valid_set, test_set, epochs=1, learning_rate=0.01, batch_size=1)
-    bed.finetune(train_set, valid_set, test_set, epochs=1, learning_rate=0.001, batch_size=1)
+    bed.finetune(train_set, valid_set, test_set, epochs=1000, learning_rate=0.1, batch_size=1)
+    bed.finetune(train_set, valid_set, test_set, epochs=1000, learning_rate=0.01, batch_size=1)
+    bed.finetune(train_set, valid_set, test_set, epochs=1000, learning_rate=0.001, batch_size=1)
+    bed.finetune(train_set, valid_set, test_set, epochs=1000, learning_rate=0.0001, batch_size=1)
+    bed.finetune(train_set, valid_set, test_set, epochs=1000, learning_rate=0.00001, batch_size=1)
 
     ###########
     # PREDICT #
