@@ -50,11 +50,15 @@ def calculate_error_indexes(y, y_pred):
     y = get_ndarray(y)
     y_pred = get_ndarray(y_pred)
 
-    # calculate Mean Absolute Error
-    mae = numpy.sum(numpy.abs(y - y_pred)) / y.shape[0]
-    mre = numpy.sum(numpy.abs(y - y_pred) / y) / y.shape[0]
+    print y
 
-    return (mae, mre)
+    mae = numpy.mean(numpy.abs(y - y_pred))
+    mre = numpy.abs(y - y_pred / y)
+    mre[mre == numpy.inf] = 0
+    mre = numpy.mean(mre)
+    rmse = numpy.sqrt(numpy.mean((y - y_pred) ** 2))
+
+    return (mae, mre, rmse)
 
 def get_ndarray(x, borrow=True):
     if isinstance(x, numpy.ndarray):

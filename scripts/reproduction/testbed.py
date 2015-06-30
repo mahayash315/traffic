@@ -111,7 +111,7 @@ def test_SdA(output_folder = None, state_filename="state.save",
     sda = SdA(
         numpy_rng=numpy_rng,
         n_ins=n_input,
-        hidden_layers_sizes=[1000, 1000, 1000],
+        hidden_layers_sizes=[400, 400, 400],
         n_outs=n_output
     )
 
@@ -240,10 +240,11 @@ def test_SdA(output_folder = None, state_filename="state.save",
     # PREDICT #
     ###########
     y_pred = predict_fn(test_set_x.get_value(borrow=True))
-    mae, mre = util.calculate_error_indexes(test_set_y, y_pred)
+    mae, mre, rmse = util.calculate_error_indexes(test_set_y, y_pred)
     print("-*-*RESULT*-*-")
     print("mae={}".format(mae))
     print("mre={}".format(mre))
+    print("rmse={}".format(rmse))
 
     # plot
     cut = min(10*144, test_set_x.get_value(borrow=True).shape[0])
@@ -291,10 +292,11 @@ def test(input_folder, state_filename="state.save",
     # PREDICT #
     ###########
     y_pred = predict_fn(test_set_x)
-    mae, mre = util.calculate_error_indexes(test_set_y, y_pred)
+    mae, mre, rmse = util.calculate_error_indexes(test_set_y, y_pred)
     print("-*-*RESULT*-*-")
     print("mae={}".format(mae))
     print("mre={}".format(mre))
+    print("rmse={}".format(rmse))
 
     # plot
     cut = min(10*144, n_test)
@@ -351,5 +353,5 @@ def load_data(r=2, d=1):
 
 if __name__ == '__main__':
     # test_theanets()
-    test_SdA()
-    # test("out/2015-6-28_14:40:25")
+    # test_SdA()
+    test("out/2015-6-29_11:39:42")
