@@ -4,8 +4,11 @@ import sys
 import time
 import datetime
 
-import theano
 import numpy
+import theano
+theano.config.exception_verbosity='high'
+theano.optimizer='fast_compile'
+
 from SdA import SdA
 
 import cPickle

@@ -109,8 +109,8 @@ class SdA(object):
         if not theano_rng:
             theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
         # allocate symbolic variables for the data
-        self.x = T.dmatrix('x')  # the data is presented as rasterized images
-        self.y = T.dmatrix('y')  # the labels are presented as 1D vector of
+        self.x = T.matrix('x')  # the data is presented as rasterized images
+        self.y = T.matrix('y')  # the labels are presented as 1D vector of
         # [int] labels
         # end-snippet-1
 
@@ -340,7 +340,7 @@ class SdA(object):
         return train_fn, valid_score, test_score
 
     def build_predict_function(self):
-        x = T.dmatrix('x') # input matrix
+        x = T.matrix('x') # input matrix
         return theano.function(
             [x],
             self.y_pred,
