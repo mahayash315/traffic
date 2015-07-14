@@ -53,8 +53,6 @@ def calculate_error_indexes(y, y_pred):
     :return:
     '''
     # retrieve numpy ndarray
-    y = get_ndarray(y)
-    y_pred = get_ndarray(y_pred)
 
     print y
 
@@ -65,13 +63,3 @@ def calculate_error_indexes(y, y_pred):
     rmse = numpy.sqrt(numpy.mean((y - y_pred) ** 2))
 
     return (mae, mre, rmse)
-
-def get_ndarray(x, borrow=True):
-    if isinstance(x, numpy.ndarray):
-        return x
-    elif isinstance(x, theano.tensor.sharedvar.TensorSharedVariable):
-        return x.get_value(borrow=borrow)
-    elif isinstance(x, list):
-        return numpy.asarray(list, dtype=theano.config.floatX)
-    else:
-        raise NotImplementedError

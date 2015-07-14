@@ -220,7 +220,7 @@ def test_SdA(state_file=None, output_folder=None):
     ###########
     y_pred = bed.predict(test_set_x.get_value(borrow=True))
 
-    mae, mre, rmse = util.calculate_error_indexes(test_set_y, y_pred)
+    mae, mre, rmse = util.calculate_error_indexes(test_set_y.get_value(borrow=True), y_pred)
     print("-*-*RESULT*-*-")
     print("mae={}".format(mae))
     print("mre={}".format(mre))

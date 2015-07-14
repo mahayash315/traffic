@@ -16,9 +16,6 @@ def figure(Y, Y_pred=None, title='', indexes=None, fig=None):
     :param block:
     :return:
     '''
-    Y = util.get_ndarray(Y)
-    Y_pred = None if Y_pred is None else util.get_ndarray(Y_pred)
-
     # count the data
     n = Y.shape[0]
     indexes = range(0,Y.shape[1]) if indexes is None else indexes
