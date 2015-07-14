@@ -170,7 +170,7 @@ class TestBed:
 
     def predict(self, x):
         predict_fn = self.sda.build_predict_function()
-        return predict_fn(util.get_ndarray(x))
+        return predict_fn(x)
 
 def test_SdA(state_file=None, output_folder=None):
     # load data
@@ -218,7 +218,7 @@ def test_SdA(state_file=None, output_folder=None):
     ###########
     # PREDICT #
     ###########
-    y_pred = bed.predict(test_set_x)
+    y_pred = bed.predict(test_set_x.get_value(borrow=True))
 
     mae, mre, rmse = util.calculate_error_indexes(test_set_y, y_pred)
     print("-*-*RESULT*-*-")
